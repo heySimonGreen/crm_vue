@@ -62,10 +62,19 @@ export const constantRoutes = [
       title: 'crm'
     },
     children: [{
-      path: '/customer',
+      path: 'customer',
       component: () => import('@/views/customer/customerManage'),
       meta: {
         title: '客户管理',
+        noCache: true
+      }
+    },
+    {
+      path: 'allContactperson',
+      name: 'allContactperson',
+      component: () => import('@/views/customer/allContactperson'),
+      meta: {
+        title: '所有客户',
         noCache: true
       }
     }]

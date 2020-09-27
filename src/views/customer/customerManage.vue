@@ -25,25 +25,27 @@
       <el-table-column
         label="编号"
         type="index"
-        width="50"
+        width="20"
         min-width="50"
         align="center"
       />
-      <el-table-column label="guid" min-width="80" align="center">
+      <el-table-column label="guid" min-width="40" align="center">
         <template slot-scope="{row}">
           <span>{{ row.guid }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="username" min-width="80" align="center">
+      <el-table-column label="username" min-width="40" align="center">
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="username" min-width="80" align="center">
-        <el-button type="success">查看所有联系人</el-button>
-        <el-button type="success">查看所有联系地址</el-button>
-        <el-button type="warning">添加联系地址</el-button>
-        <el-button type="warning">添加联系人</el-button>
+        <template slot-scope="{row}">
+          <el-button type="success" @click="gotoAllContactPerson(row)">查看所有联系人</el-button>
+          <el-button type="success">查看所有联系地址</el-button>
+          <el-button type="warning">添加联系地址</el-button>
+          <el-button type="warning">添加联系人</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <el-pagination
@@ -111,6 +113,10 @@ export default {
         .get('contactperson/selectAll')
         .then(response => (this.listcontactperson = response.data))
         .catch((response) => console.log(response))
+    },
+    gotoAllContactPerson(row) {
+      console.log('go to new page')
+      this.$router.push({ name: 'allContactperson', params: row })
     },
     getRowKeys(row) {
       return row.id
