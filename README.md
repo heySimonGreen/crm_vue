@@ -88,3 +88,6 @@ Modern browsers and Internet Explorer 10+.
 [MIT](https://github.com/PanJiaChen/vue-admin-template/blob/master/LICENSE) license.
 
 Copyright (c) 2017-present PanJiaChen
+
+## table 表嵌套select 下拉选择值，后面的值跟着变动，变量的作用范围有问题，不能是全局，要只在那行起作用才行，如何改？
+## 一共多少联系人联系地址在添加的时候可以加一个小标签
