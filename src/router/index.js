@@ -70,11 +70,11 @@ export const constantRoutes = [
       }
     },
     {
-      path: 'allContactperson',
-      name: 'allContactperson',
-      component: () => import('@/views/customer/allContactperson'),
+      path: 'CustomerDetailInfo',
+      name: 'CustomerDetailInfo',
+      component: () => import('@/views/customer/customerDetailInfo'),
       meta: {
-        title: '所有客户',
+        title: '客户详细信息',
         noCache: true
       }
     }]

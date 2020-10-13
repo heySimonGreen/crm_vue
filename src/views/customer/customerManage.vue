@@ -18,14 +18,22 @@
         :reserve-selection="true"
       />
 
-      <el-table-column
-        label="编号"
-        type="index"
-        align="center"
-      />
+      <!--      <el-table-column-->
+      <!--        label="编号"-->
+      <!--        type="index"-->
+      <!--        align="center"-->
+      <!--        fixed-->
+      <!--      />-->
+      //这个编号才是从1开始，到数据有多少行，上面的编号翻页过后还是重1开始，看着不舒服
+      <el-table-column label="编号" min-width="50" align="center" fixed>
+        <template slot-scope="scope">
+          <span>{{ scope.$index + 1 + ((currentPage - 1) * pageSize) }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="username" min-width="100" align="center" fixed>
         <template slot-scope="{row}">
-          <span>{{ row.username }}</span>
+          <span @click="goToDetail(row)">{{ row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="联系人">
@@ -118,22 +126,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="200">
         <template slot-scope="{row}">
-          <el-button type="warning" @click="testEdit(row)">编辑</el-button>
-          <el-button type="success" @click="testEdit(row)">删除</el-button>
+          <el-button type="danger" @click="delRow(row)">删除</el-button>
         </template>
       </el-table-column>
-      <!--      <el-table-column label="下拉测试" align="center" min-width="200">-->
-      <!--        <template slot-scope="scope">-->
-      <!--          <el-select v-model="scope.row['contactaddress'][0]['city']" placeholder="请选择出产国别">-->
-      <!--            <el-option-->
-      <!--              v-for="item in scope.row['contactaddress']"-->
-      <!--              :key="item.city"-->
-      <!--              :label="item.city"-->
-      <!--              :value="item.city"-->
-      <!--            />-->
-      <!--          </el-select>-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
     </el-table>
     <el-pagination
       :current-page="currentPage"
@@ -238,7 +233,7 @@
           <el-table-column label="座机号码" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.homephonenumber'" :rules="rules.contactpersonList.homephonenumber">
-                <el-input v-model.number="scope.row.homephonenumber" size="small" />
+                <el-input v-model="scope.row.homephonenumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -289,6 +284,66 @@ import qs from 'qs'
 export default {
   name: 'CustomerManage',
   data() {
+    var checkEmail = (rule, value, callback) => {
+      const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+      if (!value) {
+        return callback(new Error('邮箱不能为空'))
+      }
+      setTimeout(() => {
+        if (mailReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的邮箱格式'))
+        }
+      }, 100)
+    }
+    // 验证电话号码是否正确
+    var checkPhone = (rule, value, callback) => {
+      const phoneReg = /^1[3|4|5|7|8][0-9]{9}$/
+      if (!value) {
+        return callback(new Error('手机号不能为空'))
+      }
+      setTimeout(() => {
+        // Number.isInteger是es6验证数字是否为整数的方法,但是我实际用的时候输入的数字总是识别成字符串
+        // 所以我就在前面加了一个+实现隐式转换
+        if (!Number.isInteger(+value)) {
+          callback(new Error('请输入数字值'))
+        } else {
+          if (phoneReg.test(value)) {
+            callback()
+          } else {
+            callback(new Error('请输入正确的手机号码'))
+          }
+        }
+      }, 100)
+    }
+    // https://regex101.com/ 正则表达式学习网站
+    var checkHomePhoneNumber = (rule, value, callback) => {
+      const homePhoneNumberReg = /^(0[0-9]{2,3}\-)([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/
+      if (!value) {
+        return callback(new Error('座机号码不能为空'))
+      }
+      setTimeout(() => {
+        if (homePhoneNumberReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的座机号码'))
+        }
+      }, 100)
+    }
+    var checkStampNumber = (rule, value, callback) => {
+      const homePhoneNumberReg = /^[0-9]{6}$/
+      if (!value) {
+        return callback(new Error('邮编不能为空'))
+      }
+      setTimeout(() => {
+        if (homePhoneNumberReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的邮编'))
+        }
+      }, 100)
+    }
     return {
       addCustomerForm: {
         username: '',
@@ -316,7 +371,7 @@ export default {
         notes: [{ required: true, message: 'type is required', trigger: 'change' }],
         contactaddressList: {
           title: [{ required: true, message: 'type is required', trigger: 'change' }],
-          stampnumber: [{ required: true, message: 'type is required', trigger: 'change' }],
+          stampnumber: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkStampNumber, trigger: 'blur' }],
           country: [{ required: true, message: 'type is required', trigger: 'change' }],
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -325,10 +380,10 @@ export default {
         contactpersonList: {
           name: [{ required: true, message: 'type is required', trigger: 'change' }],
           gender: [{ required: true, message: 'type is required', trigger: 'change' }],
-          phonenumber: [{ required: true, message: 'type is required', trigger: 'change' }],
-          homephonenumber: [{ required: true, message: 'type is required', trigger: 'change' }],
+          phonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkPhone, trigger: 'blur' }],
+          homephonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkHomePhoneNumber, trigger: 'blur' }],
           wechat: [{ required: true, message: 'type is required', trigger: 'change' }],
-          email: [{ required: true, message: 'type is required', trigger: 'change' }],
+          email: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkEmail, trigger: 'blur' }],
           identity: [{ required: true, message: 'type is required', trigger: 'change' }]
         }
       },
@@ -351,20 +406,37 @@ export default {
     this.$axios
       .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
       .then(this.$axios.spread(function(acct, perms) {
-        console.log('两个请求完成')
+        console.log('3个请求完成')
       }))
     this.contactpersonRowId = 0
   },
   updated() {
     this.getCurrentTotal()
-    console.log('this.list:.....................................')
-    console.log(this.list)
-    console.log('this.listcontactaddress:')
-    console.log(this.listcontactaddress)
-    console.log('this.listcontactperson:')
-    console.log(this.listcontactperson)
   },
   methods: {
+    delRow(row) {
+      console.log(row)
+      const param = { id: row.guid }
+      this.$axios
+        .delete('http://localhost:8080/customer/deleteAllById', { params: param })
+        .then(res => {
+          console.log(res)
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+          this.lnitializationData()
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    goToDetail(cid) {
+      console.log(cid)
+      this.$router.push({ name: 'CustomerDetailInfo', query: { cid: cid.guid }})
+    },
     lnitializationData() {
       this.$axios
         .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
@@ -380,7 +452,6 @@ export default {
       this.fileComponet = false
       this.addCustomerForm.contactpersonList.splice(1, this.addCustomerForm.contactpersonList.length)
       this.addCustomerForm.contactaddressList.splice(1, this.addCustomerForm.contactaddressList.length)
-
       this.addCustomerDialogFormVisible = false
     },
     OpenDialogAddCustomer() {
@@ -458,10 +529,30 @@ export default {
       })
     },
     delRowTable1(index) {
-      this.addCustomerForm.contactaddressList.splice(index, 1)
+      // this.addCustomerForm.contactaddressList.splice(index, 1)
+
+      if (this.addCustomerForm.contactaddressList.length > 1) {
+        this.addCustomerForm.contactaddressList.splice(index, 1)
+      } else {
+        this.$notify({
+          title: '失败',
+          message: '默认联系地址不能删除',
+          type: 'error',
+          duration: 2000
+        })
+      }
     },
     delRowTable2(index) {
-      this.addCustomerForm.contactpersonList.splice(index, 1)
+      if (this.addCustomerForm.contactpersonList.length > 1) {
+        this.addCustomerForm.contactpersonList.splice(index, 1)
+      } else {
+        this.$notify({
+          title: '失败',
+          message: '默认联系人不能删除',
+          type: 'error',
+          duration: 2000
+        })
+      }
     },
     addContactaddressList: function() {
       var item = {
