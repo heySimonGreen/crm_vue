@@ -76,7 +76,8 @@ export const constantRoutes = [
       meta: {
         title: '客户详细信息',
         noCache: true
-      }
+      },
+      hidden: true
     }]
   },
 

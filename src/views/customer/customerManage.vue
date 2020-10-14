@@ -2,7 +2,7 @@
   <div class="el-container" style="display: block">
     <el-row>
       <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
-      <el-input v-model.trim="searchInput" clearable style="width: 50%;margin-left: 2%">搜索</el-input>
+      <el-input v-model.trim="searchInput" clearable style="width: 30%;margin-left: 2%" @keyup.enter.native="searchInputButton">搜索</el-input>
       <el-button @click="searchInputButton">查询</el-button>
       <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
       <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
@@ -37,18 +37,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="username" min-width="100" align="center" fixed>
+      <el-table-column label="客户名称" min-width="100" align="center" fixed>
         <template slot-scope="{row}">
           <span @click="goToDetail(row)">{{ row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="联系人">
-        <!--        <el-table-column label="姓名" align="center" min-width="60">-->
-        <!--          <template slot-scope="{row}">-->
-        <!--            <span>{{ row['contactperson'][0]['name'] }}</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-
         <el-table-column label="姓名" align="center" min-width="150">
           <template slot-scope="{row}">
             <!--            <el-select-->
@@ -70,7 +64,6 @@
             >{{ row['contactperson'][0]['name'] }}</span>
           </template>
         </el-table-column>
-
         <el-table-column label="性别" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row['contactperson'][0]['gender'] }}</span>
@@ -121,8 +114,8 @@
 
       <el-table-column label="联系地址">
         <el-table-column label="title" align="center">
-          <template slot-scope="{row}">
-            <span>{{ row['contactaddress'][0]['title'] }}</span>
+          <template slot-scope="scope">
+            <span>{{ scope.row['contactaddress'][0]['title'] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="邮编" align="center">
@@ -139,36 +132,17 @@
             <span>{{ row['contactaddress'][0]['country'] }}{{ row['contactaddress'][0]['province'] }}{{ row['contactaddress'][0]['city'] }}{{ row['contactaddress'][0]['district'] }}</span>
           </template>
         </el-table-column>
-        <!--        <el-table-column label="国家" align="center">-->
-        <!--          <template slot-scope="{row}">-->
-        <!--            <span>{{ row['contactaddress'][0]['country'] }}</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column label="省份" align="center">-->
-        <!--          <template slot-scope="{row}">-->
-        <!--            <span>{{ row['contactaddress'][0]['province'] }}</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column label="城市" align="center">-->
-        <!--          <template slot-scope="{row}">-->
-        <!--            <span>{{ row['contactaddress'][0]['city'] }}</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
-        <!--        <el-table-column label="详细地区" align="center">-->
-        <!--          <template slot-scope="{row}">-->
-        <!--            <span>{{ row['contactaddress'][0]['district'] }}</span>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="200">
         <template slot-scope="{row}">
-          <el-button type="danger" @click="delRow(row)">删除</el-button>
+          <el-button size="mini" type="danger"@click="goToDetail(row)">编辑</el-button>
+          <el-button size="mini" type="warning" @click="delRow(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination
       :current-page="currentPage"
-      :page-sizes="[3,5,10,8,15, 30, 50, 100]"
+      :page-sizes="[1,2,3,5,10,8,15, 30, 50, 100]"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="currentTotal"
@@ -216,27 +190,48 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="省份" align="center">
+          <!--          <el-table-column label="省份" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">-->
+          <!--                <el-input v-model.trim="scope.row.province" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column label="市" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">-->
+          <!--                <el-input v-model.trim="scope.row.city" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+
+          <!--          <el-table-column label="地区" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">-->
+          <!--                <el-input v-model.trim="scope.row.district" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+
+          <!--          //三级联动选择地区，免去手动输入-->
+          <el-table-column align="center" label="地址" min-width="30">
             <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">
-                <el-input v-model.trim="scope.row.province" size="small" />
+              <el-form-item :prop="'contactaddressList.' +scope.$index +'.selectedOptions'" :rules="rules.contactaddressList.selectedOptions">
+                <el-cascader
+                  v-model="scope.row.selectedOptions"
+                  :options="areaSelectData"
+                  :change-on-select="true"
+                  :clearable="true"
+                  :filterable="true"
+                  placeholder="请选择地址"
+                  class="full-width"
+                  size="medium"
+                  @change="handleChangeAddress(scope.$index)"
+                />
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="市" align="center">
-            <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">
-                <el-input v-model.trim="scope.row.city" size="small" />
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="地区" align="center">
-            <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">
-                <el-input v-model.trim="scope.row.district" size="small" />
-              </el-form-item>
-            </template>
-          </el-table-column>
+
           <el-table-column align="center" label="操作" min-width="30">
             <template slot-scope="scope">
               <el-button type="text" icon="el-icon-delete" size="small" @click="delRowTable1(scope.$index)" />
@@ -334,6 +329,7 @@
 // import json from 'fast-json-stable-stringify'
 // import VueClipboard from 'vue-clipboard2'
 import qs from 'qs'
+import { regionData, CodeToText, TextToCode } from 'element-china-area-data'
 export default {
   name: 'CustomerManage',
   data() {
@@ -397,7 +393,22 @@ export default {
         }
       }, 100)
     }
+    var checkSelectOptionIs3 = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('省市区地址不能为空'))
+      }
+      setTimeout(() => {
+        console.log('checkSelectOptionIs3   value')
+        console.log(value)
+        if (value.length === 3) {
+          callback()
+        } else {
+          callback(new Error('请选择完整的省市区地址'))
+        }
+      }, 100)
+    }
     return {
+      areaSelectData: regionData,
       addCustomerForm: {
         username: '',
         notes: '',
@@ -405,9 +416,14 @@ export default {
           title: '1',
           stampnumber: '123456',
           country: '中国',
-          province: '湖北',
-          city: '武汉',
-          district: '汉阳区拦江堤路'
+          // province: '湖北',
+          // city: '武汉',
+          // district: '汉阳区拦江堤路',
+          // 会影响传过去的对象转为实体吗
+          selectedOptions: [],
+          province: '',
+          city: '',
+          district: ''
         }],
         contactpersonList: [{
           name: 'name',
@@ -428,7 +444,8 @@ export default {
           country: [{ required: true, message: 'type is required', trigger: 'change' }],
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
-          district: [{ required: true, message: 'type is required', trigger: 'change' }]
+          district: [{ required: true, message: 'type is required', trigger: 'change' }],
+          selectedOptions: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkSelectOptionIs3, trigger: 'blur' }]
         },
         contactpersonList: {
           name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -460,7 +477,13 @@ export default {
         label: '女'
       }],
       batchSelectGuid: [],
-      searchInput: ''
+      searchInput: '',
+      form: {
+        selectedOptions: [],
+        province: '',
+        city: '',
+        area: ''
+      }
     }
   },
   mounted() {
@@ -477,13 +500,24 @@ export default {
     this.getCurrentTotal()
   },
   methods: {
+    handleChangeAddress(index) {
+      this.addCustomerForm.contactaddressList[index].province = this.addCustomerForm.contactaddressList[index].selectedOptions[0]
+      this.addCustomerForm.contactaddressList[index].city = this.addCustomerForm.contactaddressList[index].selectedOptions[1]
+      this.addCustomerForm.contactaddressList[index].area = this.addCustomerForm.contactaddressList[index].selectedOptions[2]
+      console.log('this.form.province city area')
+      console.log(this.addCustomerForm.contactaddressList[index].province)
+      console.log(this.addCustomerForm.contactaddressList[index].city)
+      console.log(this.addCustomerForm.contactaddressList[index].area)
+      console.log('handleChangeAddress index.............')
+      console.log(index)
+    },
     searchInputButton() {
       console.log(this.searchInput)
       console.log('已到达搜索请求')
       this.$axios.post('http://localhost:8080/customer/searchInputButton', { 'input': this.searchInput }, { timeout: 3000 })
         .then(res => {
           console.log(res)
-          if (res.data.length > 1) {
+          if (res.data.length > 0) {
             this.list = res.data
             this.$notify({
               title: '成功',
@@ -524,7 +558,7 @@ export default {
               type: 'error',
               duration: 4000
             })
-            // this.lnitializationData()
+            this.lnitializationData()
           })
           .catch(err => {
             console.log(err)
@@ -745,7 +779,12 @@ export default {
     getcustomerList() {
       this.$axios
         .get('customer/selectAllTest')
-        .then(response => (this.list = response.data))
+        .then(response => {
+          this.list = response.data
+          console.log('this.list')
+          console.log(this.list)
+        }
+        )
         .catch((response) => console.log(response))
     },
     // 下面的两个方法没有用到，是以前用来测试的
@@ -766,8 +805,8 @@ export default {
       this.$router.push({ name: 'allContactperson', params: row })
     },
     getRowKeys(row) {
-      console.log('row.id:')
-      console.log(row.guid)
+      // console.log('row.id:')
+      // console.log(row.guid)
       return row.guid
     },
     handleSelectionChange(val) {
@@ -790,6 +829,8 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val
       console.log(`当前页: ${val}`)
+      console.log('当前页数据')
+      console.log(this.list[14])
     },
     getCurrentTotal() {
       this.currentTotal = this.list.length
