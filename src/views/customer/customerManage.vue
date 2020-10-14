@@ -1,6 +1,8 @@
 <template>
   <div class="el-container" style="display: block">
-    <el-button type="warming" @click="addCustomer">添加客户</el-button>
+    <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
+    <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
+    <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
     <el-table
       v-if="list[0]"
       :key="tableKey"
@@ -454,7 +456,7 @@ export default {
         label: '女'
       }],
       tableKey: 0,
-      batchSelect: []
+      batchSelectGuid: []
     }
   },
   mounted() {
@@ -471,9 +473,45 @@ export default {
     this.getCurrentTotal()
   },
   methods: {
+    batchDeletCustomer() {
+      console.log('已进入点击按钮后...')
+      if (this.batchSelectGuid.length > 0) {
+        console.log('已选择选项')
+        this.$axios.post('http://localhost:8080/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
+          .then(res => {
+            console.log(res)
+            this.editAddressItemDataVisible = false
+            this.$notify({
+              title: '成功',
+              message: '批量删除成功',
+              type: 'success',
+              duration: 4000
+            })
+            this.lnitializationData()
+          })
+          .catch(err => {
+            console.log(err)
+            this.$notify({
+              title: '批量删除失败',
+              message: '请选择需要删除的行',
+              type: 'error',
+              duration: 4000
+            })
+          })
+      } else {
+        console.log('未选择选项')
+        this.$notify({
+          title: '批量删除失败',
+          message: '请选择需要删除的行',
+          type: 'error',
+          duration: 4000
+        })
+      }
+    },
     getRowKeys(row) {
       return row.id
     },
+    // 下面是点击复制代码
     copy(e) {
       console.log(e.email)
       console.log(e.text)
@@ -695,8 +733,15 @@ export default {
     handleSelectionChange(val) {
       console.log('handleSelectionChange:')
       console.log(val)
-      // this.batchSelect = val.get(guid)
-      // console.log(this.batchSelect)
+      // 将选择的行的guid保存在batchSelectGuid中，用于批量删除
+      for (let i = 0; i < val.length; i++) {
+        console.log(i)
+        this.batchSelectGuid[i] = val[i].guid
+      }
+      console.log('this.batchSelectGuid:')
+      console.log(this.batchSelectGuid)
+      console.log('this.batchSelectGuid.length:')
+      console.log(this.batchSelectGuid.length)
     },
     handleSizeChange(val) {
       this.pageSize = val
