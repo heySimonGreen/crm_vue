@@ -1,6 +1,7 @@
 <template>
   <div class="el-container" style="display: block">
     <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
+    <el-input>搜索</el-input>
     <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
     <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
     <el-table
@@ -455,7 +456,6 @@ export default {
         value: '女',
         label: '女'
       }],
-      tableKey: 0,
       batchSelectGuid: []
     }
   },
@@ -728,7 +728,9 @@ export default {
       this.$router.push({ name: 'allContactperson', params: row })
     },
     getRowKeys(row) {
-      return row.id
+      console.log('row.id:')
+      console.log(row.guid)
+      return row.guid
     },
     handleSelectionChange(val) {
       console.log('handleSelectionChange:')
