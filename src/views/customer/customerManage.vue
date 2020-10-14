@@ -1,9 +1,12 @@
 <template>
   <div class="el-container" style="display: block">
-    <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
-    <el-input>搜索</el-input>
-    <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
-    <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
+    <el-row>
+      <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
+      <el-input v-model.trim="searchInput" clearable style="width: 50%;margin-left: 2%">搜索</el-input>
+      <el-button @click="searchInputButton">查询</el-button>
+      <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
+      <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
+    </el-row>
     <el-table
       v-if="list[0]"
       :key="tableKey"
@@ -27,7 +30,7 @@
       <!--        align="center"-->
       <!--        fixed-->
       <!--      />-->
-      //这个编号才是从1开始，到数据有多少行，上面的编号翻页过后还是重1开始，看着不舒服
+      <!--      //这个编号才是从1开始，到数据有多少行，上面的编号翻页过后还是重1开始，看着不舒服-->
       <el-table-column label="编号" min-width="50" align="center" fixed>
         <template slot-scope="scope">
           <span>{{ scope.$index + 1 + ((currentPage - 1) * pageSize) }}</span>
@@ -177,10 +180,10 @@
     <el-dialog title="添加客户" width="85%" :visible.sync="addCustomerDialogFormVisible" @close="CloseDialogAddCustomer()" @open="OpenDialogAddCustomer()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="addCustomerForm" :rules="rules" :model="addCustomerForm" label-position="left">
         <el-form-item label="姓名" prop="username" label-width="100px">
-          <el-input v-model="addCustomerForm.username" />
+          <el-input v-model.trim="addCustomerForm.username" />
         </el-form-item>
         <el-form-item label="备注" prop="notes" label-width="100px">
-          <el-input v-model="addCustomerForm.notes" />
+          <el-input v-model.trim="addCustomerForm.notes" />
         </el-form-item>
         <div style="display: flex;flex-direction: column">
           <h3 style="text-align: center">联系地址</h3>
@@ -195,42 +198,42 @@
           <el-table-column label="title" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactaddressList.' +scope.$index +'.title'" :rules="rules.contactaddressList.title">
-                <el-input v-model="scope.row.title" size="small" />
+                <el-input v-model.trim="scope.row.title" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="邮编" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.stampnumber'" :rules="rules.contactaddressList.stampnumber">
-                <el-input v-model.number="scope.row.stampnumber" size="small" />
+                <el-input v-model.trim="scope.row.stampnumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="国家" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.country'" :rules="rules.contactaddressList.country">
-                <el-input v-model="scope.row.country" size="small" />
+                <el-input v-model.trim="scope.row.country" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="省份" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">
-                <el-input v-model="scope.row.province" size="small" />
+                <el-input v-model.trim="scope.row.province" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="市" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">
-                <el-input v-model="scope.row.city" size="small" />
+                <el-input v-model.trim="scope.row.city" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="地区" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">
-                <el-input v-model="scope.row.district" size="small" />
+                <el-input v-model.trim="scope.row.district" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -253,7 +256,7 @@
           <el-table-column label="姓名" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.name'" :rules="rules.contactpersonList.name">
-                <el-input v-model="scope.row.name" size="small" />
+                <el-input v-model.trim="scope.row.name" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -456,7 +459,8 @@ export default {
         value: '女',
         label: '女'
       }],
-      batchSelectGuid: []
+      batchSelectGuid: [],
+      searchInput: ''
     }
   },
   mounted() {
@@ -473,6 +477,40 @@ export default {
     this.getCurrentTotal()
   },
   methods: {
+    searchInputButton() {
+      console.log(this.searchInput)
+      console.log('已到达搜索请求')
+      this.$axios.post('http://localhost:8080/customer/searchInputButton', { 'input': this.searchInput }, { timeout: 3000 })
+        .then(res => {
+          console.log(res)
+          if (res.data.length > 1) {
+            this.list = res.data
+            this.$notify({
+              title: '成功',
+              message: '查询成功',
+              type: 'success',
+              duration: 4000
+            })
+          } else {
+            this.$notify({
+              title: '查无此人',
+              message: '查无此人',
+              type: 'success',
+              duration: 4000
+            })
+          }
+          // this.lnitializationData()
+        })
+        .catch(err => {
+          console.log(err)
+          this.$notify({
+            title: '批量删除失败',
+            message: '失败',
+            type: 'error',
+            duration: 4000
+          })
+        })
+    },
     batchDeletCustomer() {
       console.log('已进入点击按钮后...')
       if (this.batchSelectGuid.length > 0) {
@@ -480,20 +518,19 @@ export default {
         this.$axios.post('http://localhost:8080/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
           .then(res => {
             console.log(res)
-            this.editAddressItemDataVisible = false
             this.$notify({
               title: '成功',
               message: '批量删除成功',
-              type: 'success',
+              type: 'error',
               duration: 4000
             })
-            this.lnitializationData()
+            // this.lnitializationData()
           })
           .catch(err => {
             console.log(err)
             this.$notify({
               title: '批量删除失败',
-              message: '请选择需要删除的行',
+              message: '失败',
               type: 'error',
               duration: 4000
             })
@@ -711,6 +748,7 @@ export default {
         .then(response => (this.list = response.data))
         .catch((response) => console.log(response))
     },
+    // 下面的两个方法没有用到，是以前用来测试的
     getcontactaddressList() {
       this.$axios
         .get('contactaddress/selectAll')

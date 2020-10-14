@@ -140,49 +140,49 @@
           <el-table-column label="姓名" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.name'" :rules="rules.contactpersonList.name">
-                <el-input v-model="scope.row.name" size="small" />
+                <el-input v-model.trim="scope.row.name" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="性别" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.gender'" :rules="rules.contactpersonList.gender">
-                <el-input v-model="scope.row.gender" size="small" />
+                <el-input v-model.trim="scope.row.gender" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="手机号码" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.phonenumber'" :rules="rules.contactpersonList.phonenumber">
-                <el-input v-model="scope.row.phonenumber" size="small" />
+                <el-input v-model.trim="scope.row.phonenumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="座机号码" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.homephonenumber'" :rules="rules.contactpersonList.homephonenumber">
-                <el-input v-model="scope.row.homephonenumber" size="small" />
+                <el-input v-model.trim="scope.row.homephonenumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="微信" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.wechat'" :rules="rules.contactpersonList.wechat">
-                <el-input v-model="scope.row.wechat" size="small" />
+                <el-input v-model.trim="scope.row.wechat" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="邮箱" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.email'" :rules="rules.contactpersonList.email">
-                <el-input v-model="scope.row.email" size="small" />
+                <el-input v-model.trim="scope.row.email" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="角色" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.identity'" :rules="rules.contactpersonList.identity">
-                <el-input v-model="scope.row.identity" size="small" />
+                <el-input v-model.trim="scope.row.identity" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -215,42 +215,42 @@
           <el-table-column label="title" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactaddressList.' +scope.$index +'.title'" :rules="rules.contactaddressList.title">
-                <el-input v-model="scope.row.title" size="small" />
+                <el-input v-model.trim="scope.row.title" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="邮编" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.stampnumber'" :rules="rules.contactaddressList.stampnumber">
-                <el-input v-model="scope.row.stampnumber" size="small" />
+                <el-input v-model.trim="scope.row.stampnumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="country" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.country'" :rules="rules.contactaddressList.country">
-                <el-input v-model="scope.row.country" size="small" />
+                <el-input v-model.trim="scope.row.country" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="province" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">
-                <el-input v-model="scope.row.province" size="small" />
+                <el-input v-model.trim="scope.row.province" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="city" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">
-                <el-input v-model="scope.row.city" size="small" />
+                <el-input v-model.trim="scope.row.city" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="district" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">
-                <el-input v-model="scope.row.district" size="small" />
+                <el-input v-model.trim="scope.row.district" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -275,7 +275,7 @@
     <el-dialog title="编辑联系人信息" width="80%" :visible.sync="editePersonItemVisible" @close="CloseDialogeditePersonItem()">
       <el-form ref="editePersonItemData" :model="editePersonItemData" :rules="rules.contactpersonList" label-width="100px">
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="editePersonItemData.name" />
+          <el-input v-model.trim="editePersonItemData.name" />
         </el-form-item>
         <el-form-item label="性别" prop="gender">
           <el-select v-model="editePersonItemData.gender" placeholder="请选择">
@@ -288,19 +288,19 @@
           </el-select>
         </el-form-item>
         <el-form-item label="电话号码" prop="phonenumber">
-          <el-input v-model="editePersonItemData.phonenumber" />
+          <el-input v-model.trim="editePersonItemData.phonenumber" />
         </el-form-item>
         <el-form-item label="座机" prop="homephonenumber">
-          <el-input v-model="editePersonItemData.homephonenumber" />
+          <el-input v-model.trim="editePersonItemData.homephonenumber" />
         </el-form-item>
         <el-form-item label="微信" prop="wechat">
-          <el-input v-model="editePersonItemData.wechat" />
+          <el-input v-model.trim="editePersonItemData.wechat" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="editePersonItemData.email" />
+          <el-input v-model.trim="editePersonItemData.email" />
         </el-form-item>
         <el-form-item label="角色" prop="identity">
-          <el-input v-model="editePersonItemData.identity" />
+          <el-input v-model.trim="editePersonItemData.identity" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm('editePersonItemData')">提交</el-button>
@@ -313,22 +313,22 @@
     <el-dialog title="编辑联系地址信息" width="80%" :visible.sync="editAddressItemDataVisible" @close="editAddressItemDataVisible = false">
       <el-form ref="editAddressItemData" :model="editAddressItemData" :rules="rules.contactaddressList" label-width="100px">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="editAddressItemData.title" />
+          <el-input v-model.trim="editAddressItemData.title" />
         </el-form-item>
         <el-form-item label="邮编" prop="stampnumber">
-          <el-input v-model="editAddressItemData.stampnumber" />
+          <el-input v-model.trim="editAddressItemData.stampnumber" />
         </el-form-item>
         <el-form-item label="国家" prop="country">
-          <el-input v-model="editAddressItemData.country" />
+          <el-input v-model.trim="editAddressItemData.country" />
         </el-form-item>
         <el-form-item label="省份" prop="province">
-          <el-input v-model="editAddressItemData.province" />
+          <el-input v-model.trim="editAddressItemData.province" />
         </el-form-item>
         <el-form-item label="城市" prop="city">
-          <el-input v-model="editAddressItemData.city" />
+          <el-input v-model.trim="editAddressItemData.city" />
         </el-form-item>
         <el-form-item label="地区" prop="district">
-          <el-input v-model="editAddressItemData.district" />
+          <el-input v-model.trim="editAddressItemData.district" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitFormEditAddressItem('editAddressItemData')">提交</el-button>
@@ -417,20 +417,20 @@ export default {
       addCustomerForm: {
         contactaddressList: [{
           title: '1',
-          stampnumber: '2',
+          stampnumber: '123456',
           country: '中国',
-          province: '4',
-          city: '5',
-          district: '6'
+          province: '湖北',
+          city: '武汉',
+          district: '汉阳区拦江堤路'
         }],
         contactpersonList: [{
-          name: '1',
-          gender: '1',
-          phonenumber: '1',
-          homephonenumber: '1',
-          wechat: '1',
-          email: '1',
-          identity: '1'
+          name: 'name',
+          gender: '男',
+          phonenumber: '18896173420',
+          homephonenumber: '023-79491111',
+          wechat: '18896173420',
+          email: '1183928999@qq.com',
+          identity: 'ceo'
         }]
       },
       rules: {
@@ -586,11 +586,11 @@ export default {
     addContactaddressList() {
       var item = {
         title: '1',
-        stampnumber: '1',
-        country: '中国sdfsdf',
-        province: '1',
-        city: '1',
-        district: '1'
+        stampnumber: '123456',
+        country: '中国',
+        province: '湖北',
+        city: '武汉',
+        district: '汉阳区拦江堤路'
       }
       this.addCustomerForm.contactaddressList.push(item)
     },
@@ -651,12 +651,12 @@ export default {
     addContactpersonList() {
       var item = {
         name: 'name',
-        gender: 'gender',
-        phonenumber: 'phonenumber',
-        homephonenumber: 'homephonenumber',
-        wechat: 'wechat',
-        email: 'email',
-        identity: 'identity'
+        gender: '男',
+        phonenumber: '18896173420',
+        homephonenumber: '023-79491111',
+        wechat: '18896173420',
+        email: '1183928999@qq.com',
+        identity: 'ceo'
       }
       this.addCustomerForm.contactpersonList.push(item)
     },
