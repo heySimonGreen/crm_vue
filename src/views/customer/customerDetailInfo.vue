@@ -16,7 +16,10 @@
     <el-row>
       <el-col :span="24" s-t-y-l-e="font-size: 20px">
         <el-button type="info">联系人信息</el-button>
-        <el-button type="warning" style="float: right" icon="el-icon-circle-plus-outline" @click="addContactPerson()">添加联系人</el-button>
+        <div style="float:right;">
+          <el-button type="warning" @click="addContactPerson()">
+            <i class="el-icon-circle-plus">添加联系人</i></el-button>
+        </div>
       </el-col>
     </el-row>
     <el-table
@@ -78,7 +81,11 @@
     <el-row>
       <el-col :span="24" s-t-y-l-e="font-size: 20px">
         <el-button type="info">联系地址信息</el-button>
-        <el-button type="warning" style="float: right" icon="el-icon-circle-plus-outline" @click="addContactAddress()">添加联系地址</el-button>
+        <!--        <el-button type="warning" style="float: right" icon="el-icon-circle-plus-outline" @click="addContactAddress()">添加联系地址</el-button>-->
+        <div style="float:right;">
+          <el-button type="warning" @click="addContactAddress()">
+            <i class="el-icon-circle-plus">添加联系地址</i></el-button>
+        </div>
       </el-col>
     </el-row>
     <el-table
@@ -147,14 +154,14 @@
           <el-table-column label="手机号码" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.phonenumber'" :rules="rules.contactpersonList.phonenumber">
-                <el-input v-model.number="scope.row.phonenumber" size="small" />
+                <el-input v-model="scope.row.phonenumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
           <el-table-column label="座机号码" align="center">
             <template slot-scope="scope">
               <el-form-item class="item" :prop="'contactpersonList.' +scope.$index +'.homephonenumber'" :rules="rules.contactpersonList.homephonenumber">
-                <el-input v-model.number="scope.row.homephonenumber" size="small" />
+                <el-input v-model="scope.row.homephonenumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -215,7 +222,7 @@
           <el-table-column label="邮编" align="center">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.stampnumber'" :rules="rules.contactaddressList.stampnumber">
-                <el-input v-model.number="scope.row.stampnumber" size="small" />
+                <el-input v-model="scope.row.stampnumber" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -281,10 +288,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="电话号码" prop="phonenumber">
-          <el-input v-model.number="editePersonItemData.phonenumber" />
+          <el-input v-model="editePersonItemData.phonenumber" />
         </el-form-item>
         <el-form-item label="座机" prop="homephonenumber">
-          <el-input v-model.number="editePersonItemData.homephonenumber" />
+          <el-input v-model="editePersonItemData.homephonenumber" />
         </el-form-item>
         <el-form-item label="微信" prop="wechat">
           <el-input v-model="editePersonItemData.wechat" />
@@ -309,7 +316,7 @@
           <el-input v-model="editAddressItemData.title" />
         </el-form-item>
         <el-form-item label="邮编" prop="stampnumber">
-          <el-input v-model.number="editAddressItemData.stampnumber" />
+          <el-input v-model="editAddressItemData.stampnumber" />
         </el-form-item>
         <el-form-item label="国家" prop="country">
           <el-input v-model="editAddressItemData.country" />
@@ -335,10 +342,78 @@
 
 <script>
 import { getCustomerDataByCidApi } from '@/api/customer'
+// import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
   data() {
+    var checkEmail = (rule, value, callback) => {
+      const mailReg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+      if (!value) {
+        return callback(new Error('邮箱不能为空'))
+      }
+      setTimeout(() => {
+        if (mailReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的邮箱格式'))
+        }
+      }, 100)
+    }
+    // 验证电话号码是否正确
+    var checkPhone = (rule, value, callback) => {
+      const phoneReg = /^1[3|4|5|7|8][0-9]{9}$/
+      if (!value) {
+        return callback(new Error('手机号不能为空'))
+      }
+      setTimeout(() => {
+        // Number.isInteger是es6验证数字是否为整数的方法,但是我实际用的时候输入的数字总是识别成字符串
+        // 所以我就在前面加了一个+实现隐式转换
+        if (!Number.isInteger(+value)) {
+          callback(new Error('请输入数字值'))
+        } else {
+          if (phoneReg.test(value)) {
+            callback()
+          } else {
+            callback(new Error('请输入正确的手机号码'))
+          }
+        }
+      }, 100)
+    }
+    // https://regex101.com/ 正则表达式学习网站
+    var checkHomePhoneNumber = (rule, value, callback) => {
+      const homePhoneNumberReg = /^(0[0-9]{2,3}\-)([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$/
+      if (!value) {
+        return callback(new Error('座机号码不能为空'))
+      }
+      setTimeout(() => {
+        if (homePhoneNumberReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的座机号码'))
+        }
+      }, 100)
+    }
+    var checkStampNumber = (rule, value, callback) => {
+      const homePhoneNumberReg = /^[0-9]{6}$/
+      if (!value) {
+        return callback(new Error('邮编不能为空'))
+      }
+      setTimeout(() => {
+        if (homePhoneNumberReg.test(value)) {
+          callback()
+        } else {
+          callback(new Error('请输入正确的邮编'))
+        }
+      }, 100)
+    }
     return {
+      genderOptions: [{
+        value: '男',
+        label: '男'
+      }, {
+        value: '女',
+        label: '女'
+      }],
       addCustomerForm: {
         contactaddressList: [{
           title: '1',
@@ -359,9 +434,11 @@ export default {
         }]
       },
       rules: {
+        username: [{ required: true, message: 'type is required', trigger: 'change' }],
+        notes: [{ required: true, message: 'type is required', trigger: 'change' }],
         contactaddressList: {
           title: [{ required: true, message: 'type is required', trigger: 'change' }],
-          stampnumber: [{ required: true, message: 'type is required', trigger: 'change' }],
+          stampnumber: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkStampNumber, trigger: 'blur' }],
           country: [{ required: true, message: 'type is required', trigger: 'change' }],
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -370,10 +447,10 @@ export default {
         contactpersonList: {
           name: [{ required: true, message: 'type is required', trigger: 'change' }],
           gender: [{ required: true, message: 'type is required', trigger: 'change' }],
-          phonenumber: [{ required: true, message: 'type is required', trigger: 'change' }],
-          homephonenumber: [{ required: true, message: 'type is required', trigger: 'change' }],
+          phonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkPhone, trigger: 'blur' }],
+          homephonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkHomePhoneNumber, trigger: 'blur' }],
           wechat: [{ required: true, message: 'type is required', trigger: 'change' }],
-          email: [{ required: true, message: 'type is required', trigger: 'change' }],
+          email: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkEmail, trigger: 'blur' }],
           identity: [{ required: true, message: 'type is required', trigger: 'change' }]
         }
       },
@@ -385,13 +462,6 @@ export default {
       addContactAddressVisible: false,
       editePersonItemVisible: false,
       editePersonItemData: '',
-      genderOptions: [{
-        value: '男',
-        label: '男'
-      }, {
-        value: '女',
-        label: '女'
-      }],
       editAddressItemData: '',
       editAddressItemDataVisible: false
     }
@@ -425,7 +495,7 @@ export default {
     },
     editeContactAddress(row) {
       console.log(row)
-      this.editAddressItemData = row
+      this.editAddressItemData = { ...row }
       this.editAddressItemDataVisible = true
     },
     // 分割，上面是editeContactAddress
@@ -460,7 +530,7 @@ export default {
       this.editePersonItemVisible = false
     },
     editePersonItem(row) {
-      this.editePersonItemData = row
+      this.editePersonItemData = { ...row }
       this.editePersonItemVisible = true
     },
     addContactAddressData() {
@@ -705,5 +775,11 @@ export default {
 </script>
 
 <style scoped>
-
+  /*//这是设置超过边框用省略号代替，-webkit-line-clamp: 1，是显示多少行,超过后省略*/
+  span{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
 </style>

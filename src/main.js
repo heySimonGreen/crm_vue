@@ -14,7 +14,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
-
+import VueClipboard from 'vue-clipboard2'
 import axiox from 'axios'
 
 /**
@@ -32,6 +32,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
+Vue.use(VueClipboard)
 Vue.prototype.$axios = axiox
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
