@@ -321,14 +321,27 @@
         <el-form-item label="国家" prop="country">
           <el-input v-model.trim="editAddressItemData.country" />
         </el-form-item>
-        <el-form-item label="省份" prop="province">
-          <el-input v-model.trim="editAddressItemData.province" />
-        </el-form-item>
-        <el-form-item label="城市" prop="city">
-          <el-input v-model.trim="editAddressItemData.city" />
-        </el-form-item>
-        <el-form-item label="地区" prop="district">
-          <el-input v-model.trim="editAddressItemData.district" />
+        <!--        <el-form-item label="省份" prop="province">-->
+        <!--          <el-input v-model.trim="editAddressItemData.province" />-->
+        <!--        </el-form-item>-->
+        <!--        <el-form-item label="城市" prop="city">-->
+        <!--          <el-input v-model.trim="editAddressItemData.city" />-->
+        <!--        </el-form-item>-->
+        <!--        <el-form-item label="地区" prop="district">-->
+        <!--          <el-input v-model.trim="editAddressItemData.district" />-->
+        <!--        </el-form-item>-->
+
+        <el-form-item label="地区" prop="selectedOptions">
+          <el-cascader
+            v-model="editAddressItemData.selectedOptions"
+            :options="areaSelectData"
+            :clearable="true"
+            placeholder="请选择地址"
+            class="full-width"
+            :filterable="true"
+            size="medium"
+            @change="handleChangeAddress()"
+          />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitFormEditAddressItem('editAddressItemData')">提交</el-button>
@@ -342,6 +355,7 @@
 
 <script>
 import { getCustomerDataByCidApi } from '@/api/customer'
+import { regionData } from 'element-china-area-data'
 // import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
@@ -406,6 +420,20 @@ export default {
         }
       }, 100)
     }
+    var checkSelectOptionIs3 = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('省市区地址不能为空'))
+      }
+      setTimeout(() => {
+        console.log('checkSelectOptionIs3   value')
+        console.log(value)
+        if (value.length === 3) {
+          callback()
+        } else {
+          callback(new Error('请选择完整的省市区地址'))
+        }
+      }, 100)
+    }
     return {
       genderOptions: [{
         value: '男',
@@ -414,14 +442,22 @@ export default {
         value: '女',
         label: '女'
       }],
+      areaSelectData: regionData,
       addCustomerForm: {
+        username: '',
+        notes: '',
         contactaddressList: [{
           title: '1',
           stampnumber: '123456',
           country: '中国',
-          province: '湖北',
-          city: '武汉',
-          district: '汉阳区拦江堤路'
+          // province: '湖北',
+          // city: '武汉',
+          // district: '汉阳区拦江堤路',
+          // 会影响传过去的对象转为实体吗
+          selectedOptions: [],
+          province: '',
+          city: '',
+          district: ''
         }],
         contactpersonList: [{
           name: 'name',
@@ -442,7 +478,8 @@ export default {
           country: [{ required: true, message: 'type is required', trigger: 'change' }],
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
-          district: [{ required: true, message: 'type is required', trigger: 'change' }]
+          district: [{ required: true, message: 'type is required', trigger: 'change' }],
+          selectedOptions: [{ required: true, message: 'type is required', trigger: 'change' }]
         },
         contactpersonList: {
           name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -470,6 +507,15 @@ export default {
     this.lnitializationData()
   },
   methods: {
+    handleChangeAddress() {
+      this.editAddressItemData.province = this.editAddressItemData.selectedOptions[0]
+      this.editAddressItemData.city = this.editAddressItemData.selectedOptions[1]
+      this.editAddressItemData.area = this.editAddressItemData.selectedOptions[2]
+      console.log('this.form.province city area')
+      console.log(this.editAddressItemData.province)
+      console.log(this.editAddressItemData.city)
+      console.log(this.editAddressItemData.area)
+    },
     submitFormEditAddressItem(editAddressItemData) {
       console.log(editAddressItemData)
       this.$refs.editAddressItemData.validate((valid) => {
@@ -496,6 +542,11 @@ export default {
     editeContactAddress(row) {
       console.log(row)
       this.editAddressItemData = { ...row }
+      var key = 'selectedOptions'
+      var value = []
+      this.editAddressItemData[key] = value
+      console.log('this.editAddressItemData........')
+      console.log(this.editAddressItemData)
       this.editAddressItemDataVisible = true
     },
     // 分割，上面是editeContactAddress
@@ -530,6 +581,7 @@ export default {
       this.editePersonItemVisible = false
     },
     editePersonItem(row) {
+      console.log(row)
       this.editePersonItemData = { ...row }
       this.editePersonItemVisible = true
     },
