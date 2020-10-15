@@ -233,24 +233,49 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="province" align="center">
+          <!--          <el-table-column label="province" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">-->
+          <!--                <el-input v-model.trim="scope.row.province" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column label="city" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">-->
+          <!--                <el-input v-model.trim="scope.row.city" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column label="district" align="center">-->
+          <!--            <template slot-scope="scope">-->
+          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">-->
+          <!--                <el-input v-model.trim="scope.row.district" size="small" />-->
+          <!--              </el-form-item>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <el-table-column align="center" label="地址" min-width="80">
             <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">
-                <el-input v-model.trim="scope.row.province" size="small" />
+              <el-form-item :prop="'contactaddressList.' +scope.$index +'.selectedOptions'" :rules="rules.contactaddressList.selectedOptions">
+                <el-cascader
+                  v-model="scope.row.selectedOptions"
+                  :options="areaSelectData"
+                  :clearable="true"
+                  :filterable="true"
+                  :change-on-select="true"
+                  placeholder="请选择地址"
+                  class="full-width"
+                  size="medium"
+                  @change="handleChangeAddress(scope.$index)"
+                />
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column label="city" align="center">
+          <!--          //在下拉地区后面添加的一个详细地址-->
+          <el-table-column label="详细地址" align="center">
             <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">
-                <el-input v-model.trim="scope.row.city" size="small" />
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="district" align="center">
-            <template slot-scope="scope">
-              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">
-                <el-input v-model.trim="scope.row.district" size="small" />
+              <el-form-item :prop="'contactaddressList.' +scope.$index +'.detaileara'" :rules="rules.contactaddressList.detaileara">
+                <el-input v-model.trim="scope.row.detaileara" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -331,17 +356,27 @@
         <!--          <el-input v-model.trim="editAddressItemData.district" />-->
         <!--        </el-form-item>-->
 
-        <el-form-item label="地区" prop="selectedOptions">
+        <el-form-item label="地区" prop="selectedOptions2">
           <el-cascader
-            v-model="editAddressItemData.selectedOptions"
+            v-model="editAddressItemData.selectedOptions2"
             :options="areaSelectData"
             :clearable="true"
             placeholder="请选择地址"
             class="full-width"
             :filterable="true"
             size="medium"
-            @change="handleChangeAddress()"
+            @change="handleChangeAddress2()"
           />
+        </el-form-item>
+        <!--        <el-table-column label="详细地址" align="center">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <el-form-item :prop="'contactaddressList.' +scope.$index +'.detaileara'" :rules="rules.contactaddressList.detaileara">-->
+        <!--              <el-input v-model.trim="scope.row.detaileara" size="small" />-->
+        <!--            </el-form-item>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
+        <el-form-item label="详细地址" prop="detaileara">
+          <el-input v-model.trim="editAddressItemData.detaileara" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitFormEditAddressItem('editAddressItemData')">提交</el-button>
@@ -434,6 +469,24 @@ export default {
         }
       }, 100)
     }
+    var checkSelectOptionIs = (rule, value, callback) => {
+      console.log('checkSelectOptionIs3.................')
+      console.log(value)
+      console.log('this.editAddressItemData in checkSelectOptionIs3')
+      console.log(this.editAddressItemData.selectedOptions2)
+      if (!this.editAddressItemData.selectedOptions2) {
+        return callback(new Error('省市区地址不能为空'))
+      }
+      setTimeout(() => {
+        console.log('checkSelectOptionIs3   value')
+        console.log(this.editAddressItemData.selectedOptions2)
+        if (this.editAddressItemData.selectedOptions2.length === 3) {
+          callback()
+        } else {
+          callback(new Error('请选择省市区地址'))
+        }
+      }, 100)
+    }
     return {
       genderOptions: [{
         value: '男',
@@ -457,7 +510,8 @@ export default {
           selectedOptions: [],
           province: '',
           city: '',
-          district: ''
+          district: '',
+          detaileara: ''
         }],
         contactpersonList: [{
           name: 'name',
@@ -479,7 +533,9 @@ export default {
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
           district: [{ required: true, message: 'type is required', trigger: 'change' }],
-          selectedOptions: [{ required: true, message: 'type is required', trigger: 'change' }]
+          detaileara: [{ required: true, message: 'type is required', trigger: 'change' }],
+          selectedOptions: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkSelectOptionIs3, trigger: 'blur' }],
+          selectedOptions2: [{ validator: checkSelectOptionIs, message: '请将地址填写完整', trigger: 'change' }]
         },
         contactpersonList: {
           name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -487,7 +543,7 @@ export default {
           phonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkPhone, trigger: 'blur' }],
           homephonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkHomePhoneNumber, trigger: 'blur' }],
           wechat: [{ required: true, message: 'type is required', trigger: 'change' }],
-          email: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkEmail, trigger: 'blur' }],
+          email: [{ required: true, message: 'type is required', trigger: 'blur' }, { message: 'type is required', validator: checkEmail, trigger: 'blur' }],
           identity: [{ required: true, message: 'type is required', trigger: 'change' }]
         }
       },
@@ -507,21 +563,38 @@ export default {
     this.lnitializationData()
   },
   methods: {
-    handleChangeAddress() {
-      this.editAddressItemData.province = this.editAddressItemData.selectedOptions[0]
-      this.editAddressItemData.city = this.editAddressItemData.selectedOptions[1]
-      this.editAddressItemData.area = this.editAddressItemData.selectedOptions[2]
+    handleChangeAddress(index) {
+      this.addCustomerForm.contactaddressList[index].province = this.addCustomerForm.contactaddressList[index].selectedOptions[0]
+      this.addCustomerForm.contactaddressList[index].city = this.addCustomerForm.contactaddressList[index].selectedOptions[1]
+      this.addCustomerForm.contactaddressList[index].district = this.addCustomerForm.contactaddressList[index].selectedOptions[2]
+      console.log('this.form.province city area')
+      console.log(this.addCustomerForm.contactaddressList[index].province)
+      console.log(this.addCustomerForm.contactaddressList[index].city)
+      console.log(this.addCustomerForm.contactaddressList[index].district)
+      console.log(this.addCustomerForm)
+      // delete this.addCustomerForm.contactaddressList[index].selectedOptions
+      console.log(this.addCustomerForm)
+      console.log('handleChangeAddress index.............')
+      console.log(index)
+    },
+    handleChangeAddress2() {
+      this.editAddressItemData.province = this.editAddressItemData.selectedOptions2[0]
+      this.editAddressItemData.city = this.editAddressItemData.selectedOptions2[1]
+      this.editAddressItemData.district = this.editAddressItemData.selectedOptions2[2]
       console.log('this.form.province city area')
       console.log(this.editAddressItemData.province)
       console.log(this.editAddressItemData.city)
-      console.log(this.editAddressItemData.area)
+      console.log(this.editAddressItemData.district)
+      console.log(this.editAddressItemData)
     },
     submitFormEditAddressItem(editAddressItemData) {
       console.log(editAddressItemData)
+      const data = { ...this.editAddressItemData }
+      delete data.selectedOptions2
       this.$refs.editAddressItemData.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
-          this.$axios.post('http://localhost:8080/contactaddress/updateAddressItem', this.editAddressItemData, { timeout: 5000 })
+          this.$axios.post('http://localhost:8080/contactaddress/updateAddressItem', data, { timeout: 5000 })
             .then(res => {
               console.log(res)
               this.editAddressItemDataVisible = false
@@ -542,8 +615,9 @@ export default {
     editeContactAddress(row) {
       console.log(row)
       this.editAddressItemData = { ...row }
-      var key = 'selectedOptions'
-      var value = []
+      // this.editAddressItemData = row
+      var key = 'selectedOptions2'
+      var value = [row.province, row.city, row.district]
       this.editAddressItemData[key] = value
       console.log('this.editAddressItemData........')
       console.log(this.editAddressItemData)
@@ -589,8 +663,18 @@ export default {
       this.$refs.AddContactAddress.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
+          console.log('this.addCustomerForm.contactaddressList.............')
+          console.log(this.addCustomerForm.contactaddressList)
+          // 删除多余的selectedOptions，因为后台接收不了，不方便直接转换为实体
+          for (let i = 0; i < this.addCustomerForm.contactaddressList.length; i++) {
+            delete this.addCustomerForm.contactaddressList[i].selectedOptions
+          }
           const dataAddContactAddress = this.addCustomerForm.contactaddressList
-          this.$axios.post('http://localhost:8080/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+          // for (let i = 0; i < dataAddContactAddress.length; i++) {
+          //   delete dataAddContactAddress[i].selectedOptions
+          // }
+          console.log(this.addCustomerForm.contactaddressList)
+          this.$axios.post('http://localhost:8080/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
             .then(res => {
               console.log(res)
               this.addContactAddressVisible = false
@@ -640,9 +724,11 @@ export default {
         title: '1',
         stampnumber: '123456',
         country: '中国',
-        province: '湖北',
-        city: '武汉',
-        district: '汉阳区拦江堤路'
+        province: '1',
+        city: '1',
+        district: '1',
+        detaileara: '拦江堤路',
+        selectedOptions: []
       }
       this.addCustomerForm.contactaddressList.push(item)
     },

@@ -129,7 +129,20 @@
         </el-table-column>
         <el-table-column label="联系地址" align="center" min-width="200">
           <template slot-scope="{row}">
-            <span>{{ row['contactaddress'][0]['country'] }}{{ row['contactaddress'][0]['province'] }}{{ row['contactaddress'][0]['city'] }}{{ row['contactaddress'][0]['district'] }}</span>
+            <!--            <span>{{ row['contactaddress'][0]['country'] }}{{ row['contactaddress'][0]['province'] }}{{ row['contactaddress'][0]['city'] }}{{ row['contactaddress'][0]['district'] }}</span>-->
+            <span
+              v-clipboard:copy="splicingAddress(row['contactaddress'][0]['country'],
+                                                row['contactaddress'][0]['province'],
+                                                row['contactaddress'][0]['city'],
+                                                row['contactaddress'][0]['district'],
+                                                row['contactaddress'][0]['detaileara'])"
+              v-clipboard:success="copy"
+              v-clipboard:error="onError"
+            >{{ splicingAddress(row['contactaddress'][0]['country'],
+                                row['contactaddress'][0]['province'],
+                                row['contactaddress'][0]['city'],
+                                row['contactaddress'][0]['district'],
+                                row['contactaddress'][0]['detaileara']) }}</span>
           </template>
         </el-table-column>
       </el-table-column>
@@ -164,7 +177,7 @@
           <!--          <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactaddressList">添加联系地址</el-button>-->
           <div style="float:right;">
             <el-button type="primary" @click="addContactaddressList()">
-              <i class="el-icon-circle-plus">添加联系人</i></el-button>
+              <i class="el-icon-circle-plus">添加联系地址</i></el-button>
           </div>
         </div>
         <!--        table1-->
@@ -214,20 +227,28 @@
           <!--          </el-table-column>-->
 
           <!--          //三级联动选择地区，免去手动输入-->
-          <el-table-column align="center" label="地址" min-width="30">
+          <el-table-column align="center" label="地址" min-width="80">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.selectedOptions'" :rules="rules.contactaddressList.selectedOptions">
                 <el-cascader
                   v-model="scope.row.selectedOptions"
                   :options="areaSelectData"
-                  :change-on-select="true"
                   :clearable="true"
                   :filterable="true"
+                  :change-on-select="true"
                   placeholder="请选择地址"
                   class="full-width"
                   size="medium"
                   @change="handleChangeAddress(scope.$index)"
                 />
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <!--          //在下拉地区后面添加的一个详细地址-->
+          <el-table-column label="详细地址" align="center">
+            <template slot-scope="scope">
+              <el-form-item :prop="'contactaddressList.' +scope.$index +'.detaileara'" :rules="rules.contactaddressList.detaileara">
+                <el-input v-model.trim="scope.row.detaileara" size="small" />
               </el-form-item>
             </template>
           </el-table-column>
@@ -329,7 +350,7 @@
 // import json from 'fast-json-stable-stringify'
 // import VueClipboard from 'vue-clipboard2'
 import qs from 'qs'
-import { regionData, CodeToText, TextToCode } from 'element-china-area-data'
+import { regionData, CodeToText } from 'element-china-area-data'
 export default {
   name: 'CustomerManage',
   data() {
@@ -423,7 +444,8 @@ export default {
           selectedOptions: [],
           province: '',
           city: '',
-          district: ''
+          district: '',
+          detaileara: ''
         }],
         contactpersonList: [{
           name: 'name',
@@ -445,6 +467,7 @@ export default {
           province: [{ required: true, message: 'type is required', trigger: 'change' }],
           city: [{ required: true, message: 'type is required', trigger: 'change' }],
           district: [{ required: true, message: 'type is required', trigger: 'change' }],
+          detaileara: [{ required: true, message: 'type is required', trigger: 'change' }],
           selectedOptions: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkSelectOptionIs3, trigger: 'blur' }]
         },
         contactpersonList: {
@@ -500,14 +523,20 @@ export default {
     this.getCurrentTotal()
   },
   methods: {
+    splicingAddress(country, province, city, district, detaileara) {
+      return country + CodeToText[province] + CodeToText[city] + CodeToText[district] + detaileara
+    },
     handleChangeAddress(index) {
       this.addCustomerForm.contactaddressList[index].province = this.addCustomerForm.contactaddressList[index].selectedOptions[0]
       this.addCustomerForm.contactaddressList[index].city = this.addCustomerForm.contactaddressList[index].selectedOptions[1]
-      this.addCustomerForm.contactaddressList[index].area = this.addCustomerForm.contactaddressList[index].selectedOptions[2]
+      this.addCustomerForm.contactaddressList[index].district = this.addCustomerForm.contactaddressList[index].selectedOptions[2]
       console.log('this.form.province city area')
       console.log(this.addCustomerForm.contactaddressList[index].province)
       console.log(this.addCustomerForm.contactaddressList[index].city)
-      console.log(this.addCustomerForm.contactaddressList[index].area)
+      console.log(this.addCustomerForm.contactaddressList[index].district)
+      console.log(this.addCustomerForm)
+      // delete this.addCustomerForm.contactaddressList[index].selectedOptions
+      console.log(this.addCustomerForm)
       console.log('handleChangeAddress index.............')
       console.log(index)
     },
@@ -555,7 +584,7 @@ export default {
             this.$notify({
               title: '成功',
               message: '批量删除成功',
-              type: 'error',
+              type: 'success',
               duration: 4000
             })
             this.lnitializationData()
@@ -644,71 +673,70 @@ export default {
       console.log('this.addCustomerForm:')
       console.log(this.addCustomerForm)
       this.$refs.addCustomerForm.validate((valid) => {
-        // var params2 = new URLSearchParams()
-        // params2.append('chenwei', 'value1')
-        // const usernameData = this.addCustomerForm.username
-        // var params = this.addCustomerForm
-        // get
-        const customer = qs.stringify({
-          username: this.addCustomerForm.username,
-          notes: this.addCustomerForm.notes
-        })
-        const contactaddress = qs.stringify({
-          contactaddressList: this.addCustomerForm.contactaddressList }, { arrayFormat: 'indices' }
-        )
-        const contactperson = qs.stringify({
-          contactpersonList: this.addCustomerForm.contactpersonList }, { arrayFormat: 'indices' }
-        )
-        // post
-        // const username = json(this.addCustomerForm.username)
-        // const notes = json(this.addCustomerForm.notes)
-        // const guid = json(5)
-        // const contactaddressList = json(this.addCustomerForm.contactaddressList)
-        // const contactpersonList = json(this.addCustomerForm.contactpersonList)
-        // console.log(par)
-        // var params = new URLSearchParams()
-        // params.append('data', 'addCustomerForm')
-        // get
+        console.log('已选择选项')
         if (valid) {
-          console.log('已进入确认界面：')
-          this.$axios.get('customer/addCustomer', {
-            params: {
-              customer,
-              contactaddress,
-              contactperson
-            }
-          }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+          for (let i = 0; i < this.addCustomerForm.contactaddressList.length; i++) {
+            delete this.addCustomerForm.contactaddressList[i].selectedOptions
+          }
+          console.log('this.addCustomerForm.....................')
+          console.log(this.addCustomerForm)
+          this.$axios.post('http://localhost:8080/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
             .then(res => {
               console.log(res)
-              this.addCustomerDialogFormVisible = false
               this.$notify({
                 title: '成功',
-                message: '批量修改成功',
+                message: '成功',
                 type: 'success',
-                duration: 2000
+                duration: 4000
               })
               this.lnitializationData()
+              this.addCustomerDialogFormVisible = false
             })
             .catch(err => {
               console.log(err)
+              this.$notify({
+                title: '失败',
+                message: '失败',
+                type: 'error',
+                duration: 4000
+              })
             })
         }
-        // post
-        // if (valid) {
-        //   console.log('已进入确认界面：')
-        //   this.$axios.post('customer/addCustomer',
-        //     // { params: { username: this.addCustomerForm.username, notes: (this.addCustomerForm.notes), contactaddressList:(this.addCustomerForm.contactaddressList) }},
-        //     // { par: 'chenwei' },
-        //     { username, notes, guid},
-        //     { timeout: 3000 })
-        //     .then(res => {
-        //       console.log(res)
-        //     })
-        //     .catch(err => {
-        //       console.log(err)
-        //     })
-        // }
       })
+      // const customer = qs.stringify({
+      //   username: this.addCustomerForm.username,
+      //   notes: this.addCustomerForm.notes
+      // })
+      // const contactaddress = qs.stringify({
+      //   contactaddressList: this.addCustomerForm.contactaddressList }, { arrayFormat: 'indices' }
+      // )
+      // const contactperson = qs.stringify({
+      //   contactpersonList: this.addCustomerForm.contactpersonList }, { arrayFormat: 'indices' }
+      // )
+      // if (valid) {
+      //   console.log('已进入确认界面：')
+      //   this.$axios.get('customer/addCustomer', {
+      //     params: {
+      //       customer,
+      //       contactaddress,
+      //       contactperson
+      //     }
+      //   }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+      //     .then(res => {
+      //       console.log(res)
+      //       this.addCustomerDialogFormVisible = false
+      //       this.$notify({
+      //         title: '成功',
+      //         message: '批量修改成功',
+      //         type: 'success',
+      //         duration: 2000
+      //       })
+      //       this.lnitializationData()
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //     })
+      // }
     },
     delRowTable1(index) {
       // this.addCustomerForm.contactaddressList.splice(index, 1)
@@ -743,7 +771,9 @@ export default {
         country: '中国',
         province: '1',
         city: '1',
-        district: '1'
+        district: '1',
+        detaileara: '拦江堤路',
+        selectedOptions: []
       }
       this.addCustomerForm.contactaddressList.push(item)
     },
@@ -770,12 +800,6 @@ export default {
       this.contactpersonRowId = data
       console.log(this.contactpersonRowId)
     },
-    // getcustomerList() {
-    //   this.$axios
-    //     .get('customer/selectAll')
-    //     .then(response => (this.list = response.data))
-    //     .catch((response) => console.log(response))
-    // },
     getcustomerList() {
       this.$axios
         .get('customer/selectAllTest')
