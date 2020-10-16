@@ -24,12 +24,6 @@
         :reserve-selection="true"
       />
 
-      <!--      <el-table-column-->
-      <!--        label="编号"-->
-      <!--        type="index"-->
-      <!--        align="center"-->
-      <!--        fixed-->
-      <!--      />-->
       <!--      //这个编号才是从1开始，到数据有多少行，上面的编号翻页过后还是重1开始，看着不舒服-->
       <el-table-column label="编号" min-width="50" align="center" fixed>
         <template slot-scope="scope">
@@ -42,21 +36,15 @@
           <span @click="goToDetail(row)">{{ row.username }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="客户类型" min-width="100" align="center" fixed>
+        <template slot-scope="{row}">
+          <el-button v-if="row.role == 0" type="success" size="mini">个人</el-button>
+          <el-button v-else type="primary" size="mini">企业</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="联系人">
-        <el-table-column label="姓名" align="center" min-width="150">
+        <el-table-column label="姓名" align="center" min-width="100">
           <template slot-scope="{row}">
-            <!--            <el-select-->
-            <!--              v-model="scope.row['contactperson'][0]['name']"-->
-            <!--              placeholder="请选择联系人"-->
-            <!--              @change="handleChange"-->
-            <!--            >-->
-            <!--              <el-option-->
-            <!--                v-for="(item, index) in scope.row['contactperson']"-->
-            <!--                :key="index"-->
-            <!--                :label="item.name"-->
-            <!--                :value="index"-->
-            <!--              />-->
-            <!--            </el-select>-->
             <span
               v-clipboard:copy="row['contactperson'][0]['name']"
               v-clipboard:success="copy"
@@ -64,11 +52,11 @@
             >{{ row['contactperson'][0]['name'] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="性别" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row['contactperson'][0]['gender'] }}</span>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column label="性别" align="center">-->
+        <!--          <template slot-scope="scope">-->
+        <!--            <span>{{ scope.row['contactperson'][0]['gender'] }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="电话号码" align="center" min-width="110">
           <template slot-scope="{row}">
             <span
@@ -78,24 +66,25 @@
             >{{ row['contactperson'][0]['phonenumber'] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="座机号码" align="center" min-width="120">
-          <template slot-scope="{row}">
-            <span
-              v-clipboard:copy="row['contactperson'][0]['homephonenumber']"
-              v-clipboard:success="copy"
-              v-clipboard:error="onError"
-            >{{ row['contactperson'][0]['homephonenumber'] }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="微信" align="center" min-width="110">
-          <template slot-scope="{row}">
-            <span
-              v-clipboard:copy="row['contactperson'][0]['wechat']"
-              v-clipboard:success="copy"
-              v-clipboard:error="onError"
-            >{{ row['contactperson'][0]['wechat'] }}</span>
-          </template>
-        </el-table-column>
+        <!--        <el-table-column label="座机号码" align="center" min-width="120">-->
+        <!--          <template slot-scope="{row}">-->
+        <!--            <span-->
+        <!--              v-clipboard:copy="row['contactperson'][0]['homephonenumber']"-->
+        <!--              v-clipboard:success="copy"-->
+        <!--              v-clipboard:error="onError"-->
+        <!--            >{{ row['contactperson'][0]['homephonenumber'] }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
+
+        <!--        <el-table-column label="微信" align="center" min-width="150">-->
+        <!--          <template slot-scope="{row}">-->
+        <!--            <span-->
+        <!--              v-clipboard:copy="row['contactperson'][0]['wechat']"-->
+        <!--              v-clipboard:success="copy"-->
+        <!--              v-clipboard:error="onError"-->
+        <!--            >{{ row['contactperson'][0]['wechat'] }}</span>-->
+        <!--          </template>-->
+        <!--        </el-table-column>-->
         <el-table-column label="email" align="center" min-width="150">
           <template slot-scope="{row}">
             <span
@@ -129,7 +118,6 @@
         </el-table-column>
         <el-table-column label="联系地址" align="center" min-width="200">
           <template slot-scope="{row}">
-            <!--            <span>{{ row['contactaddress'][0]['country'] }}{{ row['contactaddress'][0]['province'] }}{{ row['contactaddress'][0]['city'] }}{{ row['contactaddress'][0]['district'] }}</span>-->
             <span
               v-clipboard:copy="splicingAddress(row['contactaddress'][0]['country'],
                                                 row['contactaddress'][0]['province'],
@@ -166,6 +154,18 @@
     <!--    dialog添加客户-->
     <el-dialog title="添加客户" width="85%" :visible.sync="addCustomerDialogFormVisible" @close="CloseDialogAddCustomer()" @open="OpenDialogAddCustomer()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="addCustomerForm" :rules="rules" :model="addCustomerForm" label-position="left">
+        <el-form-item label="用户类型" prop="role" label-width="100px">
+          <div style="display: flex;justify-content: left;align-items: center">
+            <span>个人</span>
+            <el-switch
+              v-model="addCustomerForm.role"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              style="margin-left: 10px;margin-right: 10px"
+            />
+            <span>企业</span>
+          </div>
+        </el-form-item>
         <el-form-item label="姓名" prop="username" label-width="100px">
           <el-input v-model.trim="addCustomerForm.username" />
         </el-form-item>
@@ -174,7 +174,6 @@
         </el-form-item>
         <div style="display: flex;flex-direction: column">
           <h3 style="text-align: center">联系地址</h3>
-          <!--          <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactaddressList">添加联系地址</el-button>-->
           <div style="float:right;">
             <el-button type="primary" @click="addContactaddressList()">
               <i class="el-icon-circle-plus">添加联系地址</i></el-button>
@@ -203,28 +202,6 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <!--          <el-table-column label="省份" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">-->
-          <!--                <el-input v-model.trim="scope.row.province" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
-          <!--          <el-table-column label="市" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">-->
-          <!--                <el-input v-model.trim="scope.row.city" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
-
-          <!--          <el-table-column label="地区" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">-->
-          <!--                <el-input v-model.trim="scope.row.district" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
 
           <!--          //三级联动选择地区，免去手动输入-->
           <el-table-column align="center" label="地址" min-width="80">
@@ -429,8 +406,11 @@ export default {
       }, 100)
     }
     return {
+      switchvalue: true,
+      role: true,
       areaSelectData: regionData,
       addCustomerForm: {
+        role: true,
         username: '',
         notes: '',
         contactaddressList: [{
@@ -460,6 +440,7 @@ export default {
       rules: {
         username: [{ required: true, message: 'type is required', trigger: 'change' }],
         notes: [{ required: true, message: 'type is required', trigger: 'change' }],
+        role: [{ required: true, message: 'type is required', trigger: 'change' }],
         contactaddressList: {
           title: [{ required: true, message: 'type is required', trigger: 'change' }],
           stampnumber: [{ required: true, message: 'type is required', trigger: 'change' }, { validator: checkStampNumber, trigger: 'blur' }],
@@ -680,6 +661,13 @@ export default {
           }
           console.log('this.addCustomerForm.....................')
           console.log(this.addCustomerForm)
+          // ture is 企业1 false is个人0
+          if (this.addCustomerForm.role === true) {
+            this.addCustomerForm.role = 1
+          } else {
+            this.addCustomerForm.role = 0
+          }
+          console.log(this.addCustomerForm)
           this.$axios.post('http://localhost:8080/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
             .then(res => {
               console.log(res)
@@ -703,40 +691,6 @@ export default {
             })
         }
       })
-      // const customer = qs.stringify({
-      //   username: this.addCustomerForm.username,
-      //   notes: this.addCustomerForm.notes
-      // })
-      // const contactaddress = qs.stringify({
-      //   contactaddressList: this.addCustomerForm.contactaddressList }, { arrayFormat: 'indices' }
-      // )
-      // const contactperson = qs.stringify({
-      //   contactpersonList: this.addCustomerForm.contactpersonList }, { arrayFormat: 'indices' }
-      // )
-      // if (valid) {
-      //   console.log('已进入确认界面：')
-      //   this.$axios.get('customer/addCustomer', {
-      //     params: {
-      //       customer,
-      //       contactaddress,
-      //       contactperson
-      //     }
-      //   }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
-      //     .then(res => {
-      //       console.log(res)
-      //       this.addCustomerDialogFormVisible = false
-      //       this.$notify({
-      //         title: '成功',
-      //         message: '批量修改成功',
-      //         type: 'success',
-      //         duration: 2000
-      //       })
-      //       this.lnitializationData()
-      //     })
-      //     .catch(err => {
-      //       console.log(err)
-      //     })
-      // }
     },
     delRowTable1(index) {
       // this.addCustomerForm.contactaddressList.splice(index, 1)

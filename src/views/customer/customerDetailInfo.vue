@@ -10,7 +10,12 @@
         <span style="font-size: 20px;margin-bottom: 30px">姓名:  {{ this.customerData.username }}</span>
       </el-col>
       <el-col :span="23" :offset="1">
-        <span style="font-size: 20px">备注:  {{ this.customerData.notes }}</span>
+        <span style="font-size: 20px;margin-bottom: 30px"">备注:  {{ this.customerData.notes }}</span>
+      </el-col>
+      <el-col :span="23" :offset="1" style="display: flex;justify-content: left;align-items: center;margin-bottom: 30px"">
+        <span style="font-size: 20px;margin-right: 5px">客户类型:</span>
+        <el-button v-if="this.customerData.role == 0" type="success" size="mini">个人</el-button>
+        <el-button v-else type="primary" size="mini">企业</el-button>
       </el-col>
     </el-row>
     <el-row>
@@ -114,15 +119,9 @@
       </el-table-column>
       <el-table-column label="地址" min-width="100" align="center">
         <template slot-scope="{ row }">
-          <span style="text-align: center"> {{ row.country }}{{ row.province }}{{ row.city }}{{ row.district }} </span>
+          <span style="text-align: center"> {{ splicingAddress(row.country,row.province,row.city,row.district,row.detaileara) }} </span>
         </template>
       </el-table-column>
-      <!--      <el-table-column label="操作" min-width="100" align="center">-->
-      <!--        <template slot-scope="{ row }">-->
-      <!--          <el-button type="primary" icon="el-icon-edit" @click="editeContactAddress(row)" />-->
-      <!--          <el-button type="primary" icon="el-icon-delete" @click="delAddressItem(row,row.$index)" />-->
-      <!--        </template>-->
-      <!--      </el-table-column>-->
       <el-table-column label="操作" min-width="100" align="center">
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-edit" @click="editeContactAddress(scope.row)" />
@@ -233,27 +232,6 @@
               </el-form-item>
             </template>
           </el-table-column>
-          <!--          <el-table-column label="province" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.province'" :rules="rules.contactaddressList.province">-->
-          <!--                <el-input v-model.trim="scope.row.province" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
-          <!--          <el-table-column label="city" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.city'" :rules="rules.contactaddressList.city">-->
-          <!--                <el-input v-model.trim="scope.row.city" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
-          <!--          <el-table-column label="district" align="center">-->
-          <!--            <template slot-scope="scope">-->
-          <!--              <el-form-item :prop="'contactaddressList.' +scope.$index +'.district'" :rules="rules.contactaddressList.district">-->
-          <!--                <el-input v-model.trim="scope.row.district" size="small" />-->
-          <!--              </el-form-item>-->
-          <!--            </template>-->
-          <!--          </el-table-column>-->
           <el-table-column align="center" label="地址" min-width="80">
             <template slot-scope="scope">
               <el-form-item :prop="'contactaddressList.' +scope.$index +'.selectedOptions'" :rules="rules.contactaddressList.selectedOptions">
@@ -346,16 +324,6 @@
         <el-form-item label="国家" prop="country">
           <el-input v-model.trim="editAddressItemData.country" />
         </el-form-item>
-        <!--        <el-form-item label="省份" prop="province">-->
-        <!--          <el-input v-model.trim="editAddressItemData.province" />-->
-        <!--        </el-form-item>-->
-        <!--        <el-form-item label="城市" prop="city">-->
-        <!--          <el-input v-model.trim="editAddressItemData.city" />-->
-        <!--        </el-form-item>-->
-        <!--        <el-form-item label="地区" prop="district">-->
-        <!--          <el-input v-model.trim="editAddressItemData.district" />-->
-        <!--        </el-form-item>-->
-
         <el-form-item label="地区" prop="selectedOptions2">
           <el-cascader
             v-model="editAddressItemData.selectedOptions2"
@@ -368,13 +336,6 @@
             @change="handleChangeAddress2()"
           />
         </el-form-item>
-        <!--        <el-table-column label="详细地址" align="center">-->
-        <!--          <template slot-scope="scope">-->
-        <!--            <el-form-item :prop="'contactaddressList.' +scope.$index +'.detaileara'" :rules="rules.contactaddressList.detaileara">-->
-        <!--              <el-input v-model.trim="scope.row.detaileara" size="small" />-->
-        <!--            </el-form-item>-->
-        <!--          </template>-->
-        <!--        </el-table-column>-->
         <el-form-item label="详细地址" prop="detaileara">
           <el-input v-model.trim="editAddressItemData.detaileara" />
         </el-form-item>
@@ -390,7 +351,7 @@
 
 <script>
 import { getCustomerDataByCidApi } from '@/api/customer'
-import { regionData } from 'element-china-area-data'
+import { CodeToText, regionData } from 'element-china-area-data'
 // import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
@@ -563,6 +524,9 @@ export default {
     this.lnitializationData()
   },
   methods: {
+    splicingAddress(country, province, city, district, detaileara) {
+      return country + CodeToText[province] + CodeToText[city] + CodeToText[district] + detaileara
+    },
     handleChangeAddress(index) {
       this.addCustomerForm.contactaddressList[index].province = this.addCustomerForm.contactaddressList[index].selectedOptions[0]
       this.addCustomerForm.contactaddressList[index].city = this.addCustomerForm.contactaddressList[index].selectedOptions[1]
@@ -670,9 +634,6 @@ export default {
             delete this.addCustomerForm.contactaddressList[i].selectedOptions
           }
           const dataAddContactAddress = this.addCustomerForm.contactaddressList
-          // for (let i = 0; i < dataAddContactAddress.length; i++) {
-          //   delete dataAddContactAddress[i].selectedOptions
-          // }
           console.log(this.addCustomerForm.contactaddressList)
           this.$axios.post('http://localhost:8080/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
             .then(res => {
@@ -863,23 +824,6 @@ export default {
           duration: 2000
         })
       }
-      // console.log(row)
-      // const param = { id: row.id }
-      // this.$axios
-      //   .delete('http://localhost:8080/contactperson/deleteById', { params: param })
-      //   .then(res => {
-      //     console.log(res)
-      //     this.$notify({
-      //       title: '成功',
-      //       message: '删除成功',
-      //       type: 'success',
-      //       duration: 2000
-      //     })
-      //     this.lnitializationData()
-      //   })
-      //   .catch(err => {
-      //     console.log(err)
-      //   })
     },
     // 这是封装在api下的方法，比下面少了几行代码而已，所以后面的代码我也就不封装了，封装在api里面只能用get，post方法只能像下面一样写在那里
     getCustomerDataByCid() {
