@@ -5,6 +5,23 @@ export function login(data) {
     url: '/vue-admin-template/user/login',
     method: 'post',
     data
+    // url: '/admin/loginpost',
+    // method: 'post',
+    // data
+  })
+}
+export function loginMyselfPost(data) {
+  return request({
+    url: 'http://localhost:8080/admin/loginpost',
+    method: 'post',
+    data
+  })
+}
+export function loginMyself(data) {
+  return request({
+    url: '/admin/login',
+    method: 'get',
+    params: data
   })
 }
 

@@ -2,7 +2,15 @@
   <div class="el-container" style="display: block">
     <el-row>
       <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
-      <el-input v-model.trim="searchInput" clearable style="width: 50%;margin-left: 2%">搜索</el-input>
+      <el-input v-model.trim="searchInput" placeholder="请输入客户姓名" clearable style="width: 50%;margin-left: 2%">搜索</el-input>
+      <el-select v-model="optionsSearchData" placeholder="请选择客户类型">
+        <el-option
+          v-for="item in optionsSearch"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
       <el-button @click="searchInputButton">查询</el-button>
       <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
       <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
@@ -11,7 +19,7 @@
       v-if="list[0]"
       :key="tableKey"
       :row-key="getRowKeys"
-      :data="list.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="list"
       border
       fit
       highlight-current-row
@@ -328,6 +336,7 @@
 // import VueClipboard from 'vue-clipboard2'
 import qs from 'qs'
 import { regionData, CodeToText } from 'element-china-area-data'
+import { getadminid } from '@/utils/auth'
 export default {
   name: 'CustomerManage',
   data() {
@@ -406,6 +415,7 @@ export default {
       }, 100)
     }
     return {
+      adminid: getadminid(),
       switchvalue: true,
       role: true,
       areaSelectData: regionData,
@@ -425,7 +435,7 @@ export default {
           province: '',
           city: '',
           district: '',
-          detaileara: ''
+          detaileara: '拦江堤路'
         }],
         contactpersonList: [{
           name: 'name',
@@ -487,22 +497,31 @@ export default {
         province: '',
         city: '',
         area: ''
-      }
+      },
+      optionsSearch: [{
+        value: 0,
+        label: '个人'
+      }, {
+        value: 1,
+        label: '企业'
+      }],
+      optionsSearchData: ''
     }
   },
   mounted() {
   },
   created() {
     this.$axios
-      .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
+      // .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
+      .all([this.getcustomerList()])
       .then(this.$axios.spread(function(acct, perms) {
         console.log('3个请求完成')
       }))
     this.contactpersonRowId = 0
   },
-  updated() {
-    this.getCurrentTotal()
-  },
+  // updated() {
+  //   this.getCurrentTotal()
+  // },
   methods: {
     splicingAddress(country, province, city, district, detaileara) {
       return country + CodeToText[province] + CodeToText[city] + CodeToText[district] + detaileara
@@ -522,13 +541,17 @@ export default {
       console.log(index)
     },
     searchInputButton() {
+      console.log('this.optionsSearchData')
+      console.log(this.optionsSearchData)
       console.log(this.searchInput)
       console.log('已到达搜索请求')
-      this.$axios.post('http://localhost:8080/customer/searchInputButton', { 'input': this.searchInput }, { timeout: 3000 })
+      this.$axios.post('http://localhost:8080/customer/searchInputButton', { 'input': this.searchInput, 'role': this.optionsSearchData }, { timeout: 3000 })
         .then(res => {
           console.log(res)
           if (res.data.length > 0) {
             this.list = res.data
+            console.log('this.list...........................')
+            console.log(this.list)
             this.$notify({
               title: '成功',
               message: '查询成功',
@@ -548,8 +571,8 @@ export default {
         .catch(err => {
           console.log(err)
           this.$notify({
-            title: '批量删除失败',
-            message: '失败',
+            title: '失败',
+            message: '输入需要查找的客户',
             type: 'error',
             duration: 4000
           })
@@ -568,6 +591,7 @@ export default {
               type: 'success',
               duration: 4000
             })
+            this.batchSelectGuid = []
             this.lnitializationData()
           })
           .catch(err => {
@@ -631,7 +655,8 @@ export default {
     },
     lnitializationData() {
       this.$axios
-        .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
+        // .all([this.getcustomerList(), this.getcontactaddressList(), this.getcontactpersonList()])
+        .all([this.getcustomerList()])
         .then(this.$axios.spread(function(acct, perms) {
           console.log('两个请求完成')
         }))
@@ -657,8 +682,14 @@ export default {
         console.log('已选择选项')
         if (valid) {
           for (let i = 0; i < this.addCustomerForm.contactaddressList.length; i++) {
+            // this.this.addCustomerForm.contactaddressList[i].adminid = 1
+            console.log(this.adminid)
             delete this.addCustomerForm.contactaddressList[i].selectedOptions
           }
+          console.log('this.addCustomerForm.....................')
+          console.log(this.addCustomerForm)
+          this.addCustomerForm.adminid = this.adminid
+          this.addCustomerForm.isdelet = 0
           console.log('this.addCustomerForm.....................')
           console.log(this.addCustomerForm)
           // ture is 企业1 false is个人0
@@ -679,6 +710,7 @@ export default {
               })
               this.lnitializationData()
               this.addCustomerDialogFormVisible = false
+              location.reload()
             })
             .catch(err => {
               console.log(err)
@@ -756,9 +788,12 @@ export default {
     },
     getcustomerList() {
       this.$axios
-        .get('customer/selectAllTest')
+        .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
         .then(response => {
-          this.list = response.data
+          this.list = response.data.data
+          console.log('response.data.totalPage:')
+          console.log(response.data.totalPage)
+          this.currentTotal = response.data.totalPage
           console.log('this.list')
           console.log(this.list)
         }
@@ -766,18 +801,18 @@ export default {
         .catch((response) => console.log(response))
     },
     // 下面的两个方法没有用到，是以前用来测试的
-    getcontactaddressList() {
-      this.$axios
-        .get('contactaddress/selectAll')
-        .then(response => (this.listcontactaddress = response.data))
-        .catch((response) => console.log(response))
-    },
-    getcontactpersonList() {
-      this.$axios
-        .get('contactperson/selectAll')
-        .then(response => (this.listcontactperson = response.data))
-        .catch((response) => console.log(response))
-    },
+    // getcontactaddressList() {
+    //   this.$axios
+    //     .get('contactaddress/selectAll')
+    //     .then(response => (this.listcontactaddress = response.data))
+    //     .catch((response) => console.log(response))
+    // },
+    // getcontactpersonList() {
+    //   this.$axios
+    //     .get('contactperson/selectAll')
+    //     .then(response => (this.listcontactperson = response.data))
+    //     .catch((response) => console.log(response))
+    // },
     gotoAllContactPerson(row) {
       console.log('go to new page')
       this.$router.push({ name: 'allContactperson', params: row })
@@ -809,10 +844,22 @@ export default {
       console.log(`当前页: ${val}`)
       console.log('当前页数据')
       console.log(this.list[14])
-    },
-    getCurrentTotal() {
-      this.currentTotal = this.list.length
+      this.$axios
+        .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
+        .then(response => {
+          this.list = response.data.data
+          console.log('response.data.totalPage:')
+          console.log(response.data.totalPage)
+          this.currentTotal = response.data.totalPage
+          console.log('this.list')
+          console.log(this.list)
+        }
+        )
+        .catch((response) => console.log(response))
     }
+    // getCurrentTotal() {
+    //   this.currentTotal = this.list.length
+    // }
   }
 }
 </script>

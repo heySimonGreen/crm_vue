@@ -130,7 +130,7 @@
       </el-table-column>
     </el-table>
     <!--    dialog1-AddContactPerson-->
-    <el-dialog title="添加联系人" width="80%" :visible.sync="addContactPersonVisible" @close="CloseDialogAddContactPerson()" @open="OpenDialogAddContactPerson()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
+    <el-dialog title="添加联系人" width="80%" :visible.sync="addContactPersonVisible" @close="CloseDialogAddContactPerson()" @open="OpenDialogAddContactPerson()" :close-on-click-modal='false'> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="AddContactPerson" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
           <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactpersonList">增加一个联系人</el-button>
@@ -203,7 +203,7 @@
     </el-dialog>
 
     <!--    dialog2-AddContactAddress-->
-    <el-dialog title="添加联系地址" width="80%" :visible.sync="addContactAddressVisible" @close="CloseDialogAddContactAddress()" @open="OpenDialogAddContactAddress()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
+    <el-dialog title="添加联系地址" width="80%" :visible.sync="addContactAddressVisible" @close="CloseDialogAddContactAddress()" @open="OpenDialogAddContactAddress()" :close-on-click-modal='false'> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="AddContactAddress" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
           <h3 style="text-align: center">联系地址</h3>
@@ -313,7 +313,7 @@
     </el-dialog>
 
     <!--    dialog4-editAddress-->
-    <el-dialog title="编辑联系地址信息" width="80%" :visible.sync="editAddressItemDataVisible" @close="editAddressItemDataVisible = false">
+    <el-dialog title="编辑联系地址信息" width="80%" :visible.sync="editAddressItemDataVisible" @close="editAddressItemDataVisible = false" :close-on-click-modal='false'>
       <el-form ref="editAddressItemData" :model="editAddressItemData" :rules="rules.contactaddressList" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model.trim="editAddressItemData.title" />

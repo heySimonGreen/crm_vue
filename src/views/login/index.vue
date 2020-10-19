@@ -43,29 +43,29 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
+      <!--      <div class="tips">-->
+      <!--        <span style="margin-right:20px;">username: admin</span>-->
+      <!--        <span> password: any</span>-->
+      <!--      </div>-->
 
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
 import axios from 'axios'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
+    // const validateUsername = (rule, value, callback) => {
+    //   if (!validUsername(value)) {
+    //     callback(new Error('Please enter the correct user name'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('The password can not be less than 6 digits'))
@@ -76,11 +76,11 @@ export default {
     return {
       list: null,
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'dhl',
+        password: '666666'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        username: [{ required: true, trigger: 'blur', message: 'type is required' }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -101,7 +101,7 @@ export default {
     console.log('this.base_api:................')
     console.log(this.base_api)
     axios
-      .get('localhost:8080/customer/selectAll')
+      .get('/customer/selectAll')
       .then(response => (this.list = response))
     console.log(this.list)
   },
@@ -120,12 +120,21 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
+          this.$store.dispatch('user/loginMyself', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {
             this.loading = false
           })
+
+          // this.$axios.post('http://localhost:8080/admin/loginpost', { id: 1 })
+          //   .then(res => {
+          //     console.log(res)
+          //     return res
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         } else {
           console.log('error submit!!')
           return false

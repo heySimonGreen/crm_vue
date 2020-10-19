@@ -15,6 +15,13 @@ export function isExternal(path) {
  * @returns {Boolean}
  */
 export function validUsername(str) {
+  // this.$axios.get('http://localhost:8080/admin/queryAllAdmin')
+  //   .then(res => {
+  //     console.log(res)
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //   })
   const valid_map = ['admin', 'editor']
   return valid_map.indexOf(str.trim()) >= 0
 }

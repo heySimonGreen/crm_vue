@@ -1,12 +1,14 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { login, logout, getInfo, loginMyself, loginMyselfPost } from '@/api/user'
+import { getToken, setToken, removeToken, getusername, setusername, removeusername, getadminid, setadminid, removeadminid } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+    username: getusername(),
+    adminid: getadminid
   }
 }
 
@@ -24,6 +26,12 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username
+  },
+  SET_ADMINID: (state, adminid) => {
+    state.adminid = adminid
   }
 }
 
@@ -41,6 +49,65 @@ const actions = {
         reject(error)
       })
     })
+  },
+
+  loginMyself({ commit }, userInfo) {
+    const { username, password } = userInfo
+    return new Promise((resolve, reject) => {
+      loginMyself({ username: username.trim(), passwd: password }).then(response => {
+        const { data, correctUsernameAndPasswd, adminid } = response
+        if (correctUsernameAndPasswd == 1) {
+          commit('SET_TOKEN', data.token)
+          commit('SET_USERNAME', username)
+          commit('SET_ADMINID', adminid)
+          console.log('state.username')
+          console.log(state.username)
+          console.log(username)
+          setToken(data.token)
+          setusername(username)
+          setadminid(adminid)
+          resolve()
+          alert('登录成功')
+        } else {
+          alert('登录失败')
+          location.reload()
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  loginMyselfPost({ commit }, userInfo) {
+    console.info(userInfo)
+    const { username, password } = userInfo
+    // return new Promise((resolve, reject) => {
+    //   loginMyselfPost({ data: { username: username.trim(), password: password }}).then(response => {
+    //     const { data } = response
+    //     commit('SET_TOKEN', data.token)
+    //     setToken(data.token)
+    //     resolve()
+    //   }).catch(error => {
+    //     reject(error)
+    //   })
+
+    // this.$axios.post('http://localhost:8080/admin/loginpost', { id: 1 }).then(response => {
+    //   const { data } = response
+    //   commit('SET_TOKEN', data.token)
+    //   setToken(data.token)
+    //   resolve()
+    // }).catch(error => {
+    //   reject(error)
+    // })
+    // 用post不行，只能在页面单独this.$axios
+    this.$axios.post('http://localhost:8080/admin/loginpost', { id: 1 })
+      .then(res => {
+        console.log(res)
+        return res
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    // })
   },
 
   // get user info
@@ -70,6 +137,8 @@ const actions = {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
+        removeusername()
+        removeadminid()
         commit('RESET_STATE')
         resolve()
       }).catch(error => {
@@ -94,4 +163,3 @@ export default {
   mutations,
   actions
 }
-
