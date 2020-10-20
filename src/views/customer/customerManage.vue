@@ -477,7 +477,9 @@ export default {
       currentPage: 1,
       pageSize: 10,
       currentTotal: 0,
+      showPagination: true,
       list: '',
+      searchData: '',
       list2: null,
       listcontactaddress: '',
       listcontactperson: '',
@@ -550,6 +552,10 @@ export default {
           console.log(res)
           if (res.data.length > 0) {
             this.list = res.data
+            this.currentTotal = this.list.length
+            this.searchData = res.data
+            this.pageSize = 100
+            this.showPagination = false
             console.log('this.list...........................')
             console.log(this.list)
             this.$notify({
@@ -612,6 +618,7 @@ export default {
           duration: 4000
         })
       }
+      location.reload()
     },
     getRowKeys(row) {
       return row.id
@@ -838,24 +845,33 @@ export default {
     handleSizeChange(val) {
       this.pageSize = val
       console.log(`每页 ${val} 条`)
+      if (this.showPagination === false) {
+        this.list = this.searchData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+      } else {
+        this.getcustomerList()
+      }
     },
     handleCurrentChange(val) {
       this.currentPage = val
       console.log(`当前页: ${val}`)
       console.log('当前页数据')
       console.log(this.list[14])
-      this.$axios
-        .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
-        .then(response => {
-          this.list = response.data.data
-          console.log('response.data.totalPage:')
-          console.log(response.data.totalPage)
-          this.currentTotal = response.data.totalPage
-          console.log('this.list')
-          console.log(this.list)
-        }
-        )
-        .catch((response) => console.log(response))
+      if (this.showPagination === true) {
+        this.$axios
+          .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
+          .then(response => {
+            this.list = response.data.data
+            console.log('response.data.totalPage:')
+            console.log(response.data.totalPage)
+            this.currentTotal = response.data.totalPage
+            console.log('this.list')
+            console.log(this.list)
+          }
+          )
+          .catch((response) => console.log(response))
+      } else {
+        this.list = this.searchData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+      }
     }
     // getCurrentTotal() {
     //   this.currentTotal = this.list.length
