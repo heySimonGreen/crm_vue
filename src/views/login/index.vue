@@ -55,6 +55,7 @@
 <script>
 // import { validUsername } from '@/utils/validate'
 import axios from 'axios'
+import crypto from 'crypto'
 
 export default {
   name: 'Login',
@@ -76,6 +77,10 @@ export default {
     return {
       list: null,
       loginForm: {
+        username: 'dhl',
+        password: '666666'
+      },
+      loginForm2: {
         username: 'dhl',
         password: '666666'
       },
@@ -119,8 +124,21 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          var loginForm3 = {}
           this.loading = true
-          this.$store.dispatch('user/loginMyself', this.loginForm).then(() => {
+          var md5 = crypto.createHash('md5')
+          // md5.update(this.loginForm.password)
+          loginForm3.username = this.loginForm.username
+          loginForm3.password = this.loginForm.password
+          console.log('loginForm3.username')
+          console.log(loginForm3.username)
+          console.log('loginForm3.password')
+          console.log(loginForm3.password)
+          md5.update(loginForm3.password)
+          loginForm3.password = md5.digest('hex')
+          console.log(loginForm3.password)
+          // this.loginForm.password = md5.digest('hex')
+          this.$store.dispatch('user/loginMyself', loginForm3).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {

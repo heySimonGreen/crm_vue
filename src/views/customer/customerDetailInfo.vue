@@ -1,18 +1,19 @@
 <template>
   <div class="el-container" style="display: block">
-    <!--    {{ cid }}-->
-    <!--        {{ addressData }}-->
-    <!--        {{ personData }}-->
-    <!--    {{ customerData}}-->
     <el-row>
-      <el-col :span="12" :offset="12"><span style="font-size: 30px">客户基本信息</span></el-col>
-      <el-col :span="23" :offset="1">
+      <el-col :span="13" style="margin-top: 20px">
+        <div style="display:flex;width:100%;flex-direction: row;justify-content: space-between">
+          <el-button style="float: left;margin-left: 3%" @click="goBack()"><i class="el-icon-back" style="margin-left: 0" />返回</el-button>
+          <span style="font-size: 30px">客户基本信息</span>
+        </div>
+      </el-col>
+      <el-col :span="23" :offset="1" style="margin-top: 20px">
         <span style="font-size: 20px;margin-bottom: 30px">姓名:  {{ this.customerData.username }}</span>
       </el-col>
       <el-col :span="23" :offset="1">
         <span style="font-size: 20px;margin-bottom: 30px"">备注:  {{ this.customerData.notes }}</span>
       </el-col>
-      <el-col :span="23" :offset="1" style="display: flex;justify-content: left;align-items: center;margin-bottom: 30px"">
+      <el-col :span="23" :offset="1" style="display: flex;justify-content: left;align-items: center;margin-bottom: 30px">
         <span style="font-size: 20px;margin-right: 5px">客户类型:</span>
         <el-button v-if="this.customerData.role == 0" type="success" size="mini">个人</el-button>
         <el-button v-else type="primary" size="mini">企业</el-button>
@@ -35,6 +36,8 @@
       :header-cell-style="{background: '#EBEEF3'}"
       style="width: 100%;"
     >
+      <!--      <el-row>-->
+      <!--        <el-col :span="20">-->
       <el-table-column
         label="编号"
         type="index"
@@ -76,12 +79,16 @@
           <span style="text-align: center"> {{ row.identity }} </span>
         </template>
       </el-table-column>
+      <!--        </el-col>-->
+      <!--        <el-col :span="4">-->
       <el-table-column label="操作" min-width="100" align="center">
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-edit" @click="editePersonItem(scope.row)" />
           <el-button type="primary" icon="el-icon-delete" @click="delPersonItem(scope.row, scope.$index)" />
         </template>
       </el-table-column>
+      <!--        </el-col>-->
+      </el-row>
     </el-table>
     <el-row>
       <el-col :span="24" s-t-y-l-e="font-size: 20px">
@@ -101,13 +108,15 @@
       :header-cell-style="{background: '#EBEEF3'}"
       style="width: 100%;"
     >
+      <!--      <el-row>-->
+      <!--        <el-col :span="20">-->
       <el-table-column
         label="编号"
         type="index"
         align="center"
         fixed
       />
-      <el-table-column label="标题" min-width="100" align="center">
+      <el-table-column label="标题" min-width="200" align="center">
         <template slot-scope="{ row }">
           <span style="text-align: center"> {{ row.title }} </span>
         </template>
@@ -117,20 +126,24 @@
           <span style="text-align: center"> {{ row.stampnumber }} </span>
         </template>
       </el-table-column>
-      <el-table-column label="地址" min-width="100" align="center">
+      <el-table-column label="地址" min-width="400" align="center">
         <template slot-scope="{ row }">
           <span style="text-align: center"> {{ splicingAddress(row.country,row.province,row.city,row.district,row.detaileara) }} </span>
         </template>
       </el-table-column>
+      <!--        </el-col>-->
+      <!--        <el-col :span="4">-->
       <el-table-column label="操作" min-width="100" align="center">
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-edit" @click="editeContactAddress(scope.row)" />
           <el-button type="primary" icon="el-icon-delete" @click="delAddressItem(scope.row, scope.$index)" />
         </template>
       </el-table-column>
+      <!--        </el-col>-->
+      <!--      </el-row>-->
     </el-table>
     <!--    dialog1-AddContactPerson-->
-    <el-dialog title="添加联系人" width="80%" :visible.sync="addContactPersonVisible" @close="CloseDialogAddContactPerson()" @open="OpenDialogAddContactPerson()" :close-on-click-modal='false'> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
+    <el-dialog title="添加联系人" width="80%" :visible.sync="addContactPersonVisible" :close-on-click-modal="false" @close="CloseDialogAddContactPerson()" @open="OpenDialogAddContactPerson()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="AddContactPerson" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
           <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactpersonList">增加一个联系人</el-button>
@@ -203,7 +216,7 @@
     </el-dialog>
 
     <!--    dialog2-AddContactAddress-->
-    <el-dialog title="添加联系地址" width="80%" :visible.sync="addContactAddressVisible" @close="CloseDialogAddContactAddress()" @open="OpenDialogAddContactAddress()" :close-on-click-modal='false'> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
+    <el-dialog title="添加联系地址" width="80%" :visible.sync="addContactAddressVisible" :close-on-click-modal="false" @close="CloseDialogAddContactAddress()" @open="OpenDialogAddContactAddress()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="AddContactAddress" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
           <h3 style="text-align: center">联系地址</h3>
@@ -313,7 +326,7 @@
     </el-dialog>
 
     <!--    dialog4-editAddress-->
-    <el-dialog title="编辑联系地址信息" width="80%" :visible.sync="editAddressItemDataVisible" @close="editAddressItemDataVisible = false" :close-on-click-modal='false'>
+    <el-dialog title="编辑联系地址信息" width="80%" :visible.sync="editAddressItemDataVisible" :close-on-click-modal="false" @close="editAddressItemDataVisible = false">
       <el-form ref="editAddressItemData" :model="editAddressItemData" :rules="rules.contactaddressList" label-width="100px">
         <el-form-item label="标题" prop="title">
           <el-input v-model.trim="editAddressItemData.title" />
@@ -851,6 +864,11 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+    goBack() {
+      // 点击返回按钮，向后跳转
+      this.$router.go(-1)
+      console.log(this)
     }
   }
 }

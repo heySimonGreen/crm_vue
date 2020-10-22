@@ -1,5 +1,7 @@
 <template>
   <div class="el-container" style="display: block">
+    <!--    {{ this.$md5('hello') }}-->
+    <!--    {{ crypto.createHash) }}-->
     <el-row>
       <el-button type="warming" style="margin-left: 2%  " @click="addCustomer">添加客户</el-button>
       <el-input v-model.trim="searchInput" placeholder="请输入客户姓名" clearable style="width: 50%;margin-left: 2%">搜索</el-input>
@@ -337,6 +339,8 @@
 import qs from 'qs'
 import { regionData, CodeToText } from 'element-china-area-data'
 import { getadminid } from '@/utils/auth'
+import md5 from 'js-md5'
+import crypto from 'crypto'
 export default {
   name: 'CustomerManage',
   data() {
@@ -507,7 +511,9 @@ export default {
         value: 1,
         label: '企业'
       }],
-      optionsSearchData: ''
+      optionsSearchData: '',
+      updatainfo: false,
+      password: '123456'
     }
   },
   mounted() {
@@ -520,11 +526,24 @@ export default {
         console.log('3个请求完成')
       }))
     this.contactpersonRowId = 0
+    this.f()
   },
   // updated() {
   //   this.getCurrentTotal()
   // },
+  updated() {
+    if (this.updatainfo === true) {
+      location.reload()
+    }
+  },
   methods: {
+    f() {
+      var md5 = crypto.createHash('md5')
+      md5.update(this.password)
+      var password = md5.digest('hex')
+      console.log('password')
+      console.log(password)
+    },
     splicingAddress(country, province, city, district, detaileara) {
       return country + CodeToText[province] + CodeToText[city] + CodeToText[district] + detaileara
     },
@@ -566,9 +585,9 @@ export default {
             })
           } else {
             this.$notify({
-              title: '查无此人',
+              title: '失败',
               message: '查无此人',
-              type: 'success',
+              type: 'error',
               duration: 4000
             })
           }
@@ -595,10 +614,12 @@ export default {
               title: '成功',
               message: '批量删除成功',
               type: 'success',
-              duration: 4000
+              duration: 1000
             })
             this.batchSelectGuid = []
             this.lnitializationData()
+            this.updatainfo = true
+            // setTimeout(location.reload(), 9000)
           })
           .catch(err => {
             console.log(err)
@@ -606,7 +627,7 @@ export default {
               title: '批量删除失败',
               message: '失败',
               type: 'error',
-              duration: 4000
+              duration: 1000
             })
           })
       } else {
@@ -615,10 +636,11 @@ export default {
           title: '批量删除失败',
           message: '请选择需要删除的行',
           type: 'error',
-          duration: 4000
+          duration: 1000
         })
+        this.$forceUpdate()
       }
-      location.reload()
+      // setTimeout(location.reload(), 1000)
     },
     getRowKeys(row) {
       return row.id
