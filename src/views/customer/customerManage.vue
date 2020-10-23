@@ -16,6 +16,7 @@
       <el-button @click="searchInputButton">查询</el-button>
       <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
       <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
+      <el-button v-if="this.adminid == 1" type="success" style="float: right; margin-right: 2%" @click="goToRigister()">添加管理员</el-button>
     </el-row>
     <el-table
       v-if="list[0]"
@@ -681,6 +682,9 @@ export default {
     goToDetail(cid) {
       console.log(cid)
       this.$router.push({ name: 'CustomerDetailInfo', query: { cid: cid.guid }})
+    },
+    goToRigister() {
+      this.$router.push({ name: 'rigisterAdmin' })
     },
     lnitializationData() {
       this.$axios

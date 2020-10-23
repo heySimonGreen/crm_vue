@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 Vue.use(Router)
+const show = true
 
 /* Layout */
 import Layout from '@/layout'
@@ -75,6 +76,16 @@ export const constantRoutes = [
       component: () => import('@/views/customer/customerDetailInfo'),
       meta: {
         title: '客户详细信息',
+        noCache: true
+      },
+      hidden: true
+    },
+    {
+      path: 'rigisterAdmin',
+      name: 'rigisterAdmin',
+      component: () => import('@/views/customer/rigisterAdmin'),
+      meta: {
+        title: '添加管理员',
         noCache: true
       },
       hidden: true
