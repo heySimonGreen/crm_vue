@@ -16,7 +16,7 @@
       <el-button @click="searchInputButton">查询</el-button>
       <!--    //批量删除客户batchSelectGuid.length为0时注意提示“请选择删除的用户”-->
       <el-button style="float: right; margin-right: 2%" type="danger" @click="batchDeletCustomer">批量删除客户</el-button>
-      <el-button v-if="this.adminid == 1" type="success" style="float: right; margin-right: 2%" @click="goToRigister()">添加管理员</el-button>
+      <!--      <el-button v-if="this.adminid == 1" type="success" style="float: right; margin-right: 2%" @click="goToRigister()">添加管理员</el-button>-->
     </el-row>
     <el-table
       v-if="list[0]"
@@ -342,6 +342,7 @@ import { regionData, CodeToText } from 'element-china-area-data'
 import { getadminid } from '@/utils/auth'
 import md5 from 'js-md5'
 import crypto from 'crypto'
+import store from '../../store'
 export default {
   name: 'CustomerManage',
   data() {
@@ -514,7 +515,8 @@ export default {
       }],
       optionsSearchData: '',
       updatainfo: false,
-      password: '123456'
+      password: '123456',
+      url: this.$store.state.user.url
     }
   },
   mounted() {
@@ -567,7 +569,7 @@ export default {
       console.log(this.optionsSearchData)
       console.log(this.searchInput)
       console.log('已到达搜索请求')
-      this.$axios.post('http://localhost:8080/customer/searchInputButton', { 'input': this.searchInput, 'role': this.optionsSearchData }, { timeout: 3000 })
+      this.$axios.post(this.url + '/customer/searchInputButton', { 'input': this.searchInput, 'role': this.optionsSearchData }, { timeout: 3000 })
         .then(res => {
           console.log(res)
           if (res.data.length > 0) {
@@ -608,7 +610,7 @@ export default {
       console.log('已进入点击按钮后...')
       if (this.batchSelectGuid.length > 0) {
         console.log('已选择选项')
-        this.$axios.post('http://localhost:8080/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
+        this.$axios.post(this.url + '/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
           .then(res => {
             console.log(res)
             this.$notify({
@@ -664,7 +666,7 @@ export default {
       console.log(row)
       const param = { id: row.guid }
       this.$axios
-        .delete('http://localhost:8080/customer/deleteAllById', { params: param })
+        .delete(this.url + '/customer/deleteAllById', { params: param })
         .then(res => {
           console.log(res)
           this.$notify({
@@ -732,7 +734,7 @@ export default {
             this.addCustomerForm.role = 0
           }
           console.log(this.addCustomerForm)
-          this.$axios.post('http://localhost:8080/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
+          this.$axios.post(this.url + '/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
             .then(res => {
               console.log(res)
               this.$notify({
@@ -743,7 +745,8 @@ export default {
               })
               this.lnitializationData()
               this.addCustomerDialogFormVisible = false
-              location.reload()
+              this.updatainfo = true
+              // location.reload()
             })
             .catch(err => {
               console.log(err)

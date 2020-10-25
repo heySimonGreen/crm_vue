@@ -1,6 +1,11 @@
 import { login, logout, getInfo, loginMyself, loginMyselfPost } from '@/api/user'
 import { getToken, setToken, removeToken, getusername, setusername, removeusername, getadminid, setadminid, removeadminid } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import Vue from 'vue'
+import Router from 'vue-router'
+import router from '@/router'
+
+Vue.use(Router)
 
 const getDefaultState = () => {
   return {
@@ -8,7 +13,9 @@ const getDefaultState = () => {
     name: '',
     avatar: '',
     username: getusername(),
-    adminid: getadminid
+    adminid: getadminid,
+    // url: 'http://localhost:8080'
+    url: 'http://192.168.1.2:8080'
   }
 }
 
@@ -60,6 +67,7 @@ const actions = {
           commit('SET_TOKEN', data.token)
           commit('SET_USERNAME', username)
           commit('SET_ADMINID', adminid)
+
           console.log('state.username')
           console.log(state.username)
           console.log(username)
@@ -67,6 +75,7 @@ const actions = {
           setusername(username)
           setadminid(adminid)
           resolve()
+          location.reload()
           alert('登录成功')
         } else {
           alert('登录失败')

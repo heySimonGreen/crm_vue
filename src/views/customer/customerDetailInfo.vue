@@ -146,7 +146,7 @@
     <el-dialog title="添加联系人" width="80%" :visible.sync="addContactPersonVisible" :close-on-click-modal="false" @close="CloseDialogAddContactPerson()" @open="OpenDialogAddContactPerson()"> <!--重置表单数据这里好像不行，因为我是写死在数据里面的吧-->
       <el-form ref="AddContactPerson" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
-          <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactpersonList">增加一个联系人</el-button>
+          <el-button type="primary" style="float: left;width: 200px" @click="addContactpersonList"><i class="el-icon-circle-plus-outline">增加一个联系人</i></el-button>
         </div>
         <el-table :data="addCustomerForm.contactpersonList" stripe border style="width: 100%" size="mini">
           <el-table-column label="姓名" align="center">
@@ -220,7 +220,7 @@
       <el-form ref="AddContactAddress" :rules="rules" :model="addCustomerForm" label-position="left">
         <div style="display: flex;flex-direction: column">
           <h3 style="text-align: center">联系地址</h3>
-          <el-button icon="el-icon-circle-plus-outline" type="primary" style="float: left;width: 200px" @click="addContactaddressList">添加联系地址</el-button>
+          <el-button type="primary" style="float: left;width: 200px" @click="addContactaddressList"><i class="el-icon-circle-plus-outline">添加一个联系地址</i></el-button>
         </div>
         <!--        table1-->
         <el-table :data="addCustomerForm.contactaddressList" stripe border style="width: 100%" size="mini">
@@ -365,6 +365,7 @@
 <script>
 import { getCustomerDataByCidApi } from '@/api/customer'
 import { CodeToText, regionData } from 'element-china-area-data'
+import store from '../../store'
 // import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
@@ -462,6 +463,7 @@ export default {
       }, 100)
     }
     return {
+      url: this.$store.state.user.url,
       genderOptions: [{
         value: '男',
         label: '男'
@@ -571,7 +573,7 @@ export default {
       this.$refs.editAddressItemData.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
-          this.$axios.post('http://localhost:8080/contactaddress/updateAddressItem', data, { timeout: 5000 })
+          this.$axios.post(this.url + '/contactaddress/updateAddressItem', data, { timeout: 5000 })
             .then(res => {
               console.log(res)
               this.editAddressItemDataVisible = false
@@ -607,7 +609,7 @@ export default {
       this.$refs.editePersonItemData.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
-          this.$axios.post('http://localhost:8080/contactperson/updateContactItem', this.editePersonItemData, { timeout: 3000 })
+          this.$axios.post(this.url + '/contactperson/updateContactItem', this.editePersonItemData, { timeout: 3000 })
             .then(res => {
               console.log(res)
               this.editePersonItemVisible = false
@@ -648,7 +650,7 @@ export default {
           }
           const dataAddContactAddress = this.addCustomerForm.contactaddressList
           console.log(this.addCustomerForm.contactaddressList)
-          this.$axios.post('http://localhost:8080/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
+          this.$axios.post(this.url + '/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
             .then(res => {
               console.log(res)
               this.addContactAddressVisible = false
@@ -715,7 +717,7 @@ export default {
         if (valid) {
           console.log('已进入确认界面：')
           const dataAddaddContactPerson = this.addCustomerForm.contactpersonList
-          this.$axios.post('http://localhost:8080/contactperson/addContactPerson', { data: dataAddaddContactPerson, cid: this.cid }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+          this.$axios.post(this.url + '/contactperson/addContactPerson', { data: dataAddaddContactPerson, cid: this.cid }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
             .then(res => {
               console.log(res)
               this.addContactPersonVisible = false
@@ -786,7 +788,7 @@ export default {
       if (index > 0) {
         const param = { id: row.id }
         this.$axios
-          .delete('http://localhost:8080/contactaddress/deleteById', { params: param })
+          .delete(this.url + '/contactaddress/deleteById', { params: param })
           .then(res => {
             console.log(res)
             this.$notify({
@@ -815,7 +817,7 @@ export default {
       if (index > 0) {
         const param = { id: row.id }
         this.$axios
-          .delete('http://localhost:8080/contactperson/deleteById', { params: param })
+          .delete(this.url + '/contactperson/deleteById', { params: param })
           .then(res => {
             console.log(res)
             this.$notify({
@@ -848,7 +850,7 @@ export default {
         })
     },
     getContactAddressDataByCid() {
-      this.$axios.get('http://localhost:8080/contactaddress/selectByCid', { params: this.cid }, { timeout: 3000 })
+      this.$axios.get(this.url + '/contactaddress/selectByCid', { params: this.cid }, { timeout: 3000 })
         .then(res => {
           this.addressData = res.data
         })
@@ -857,7 +859,7 @@ export default {
         })
     },
     getContactPsersonDataByCid() {
-      this.$axios.get('http://localhost:8080/contactperson/selectByCid', { params: this.cid }, { timeout: 3000 })
+      this.$axios.get(this.url + '/contactperson/selectByCid', { params: this.cid }, { timeout: 3000 })
         .then(res => {
           this.personData = res.data
         })

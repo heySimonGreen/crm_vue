@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { getusername, getadminid } from '@/utils/auth'
 
 Vue.use(Router)
 const show = true
@@ -79,27 +80,44 @@ export const constantRoutes = [
         noCache: true
       },
       hidden: true
-    },
-    {
+    }
+    ]
+  }
+]
+
+const asyncRoutes = [
+  {
+    path: '/rigisterAdmin',
+    component: Layout,
+    redirect: '/rigisterAdmin',
+    children: [{
       path: 'rigisterAdmin',
       name: 'rigisterAdmin',
       component: () => import('@/views/customer/rigisterAdmin'),
-      meta: {
-        title: '添加管理员',
-        noCache: true
-      },
-      hidden: true
+      meta: { title: '注册管理员' }
     }]
-  },
-
+  }
+]
+const errorpage = [
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]
 
+const aid = getadminid()
+let rs = constantRoutes
+if (aid == 1) {
+  console.log('chenwei...............')
+  rs = constantRoutes.concat(asyncRoutes).concat(errorpage)
+} else {
+  rs = constantRoutes.concat(errorpage)
+  console.log('chenwei22222222222222222')
+  console.log(aid)
+}
+
 const createRouter = () => new Router({
   // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
+  routes: rs
 })
 
 const router = createRouter()

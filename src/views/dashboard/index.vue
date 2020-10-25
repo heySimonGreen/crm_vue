@@ -22,6 +22,8 @@ export default {
     ...mapGetters([
       'name'
     ])
+  },
+  created() {
   }
 }
 </script>

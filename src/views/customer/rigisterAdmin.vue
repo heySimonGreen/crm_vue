@@ -8,19 +8,19 @@
             prop="username"
             label="用户名"
           >
-            <el-input v-model="rigisterForm.username" />
+            <el-input v-model.trim="rigisterForm.username" />
           </el-form-item>
           <el-form-item
             prop="password"
             label="密码"
           >
-            <el-input v-model="rigisterForm.password" />
+            <el-input v-model.trim="rigisterForm.password" />
           </el-form-item>
           <el-form-item
             prop="phonenumber"
             label="电话号码"
           >
-            <el-input v-model="rigisterForm.phonenumber" />
+            <el-input v-model.trim="rigisterForm.phonenumber" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="submitRigisterForm('rigisterForm')">提交</el-button>
@@ -34,6 +34,7 @@
 
 <script>
 import crypto from 'crypto'
+import store from '../../store'
 export default {
   name: 'RigisterAdmin',
   data() {
@@ -74,7 +75,7 @@ export default {
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
         phonenumber: [{ required: true, message: 'type is required', trigger: 'blur' }, { validator: checkPhone, trigger: 'blur' }]
       },
-      url: '192.168.1.2'
+      url: this.$store.state.user.url
     }
   },
   methods: {
@@ -94,7 +95,7 @@ export default {
           submitForm.phonenumber = this.rigisterForm.phonenumber
           md5.update(submitForm.password)
           submitForm.password = md5.digest('hex')
-          this.$axios.post('http://' + this.url + ':8080/admin/rigister', submitForm, { timeout: 2000 })
+          this.$axios.post(this.url + '/admin/rigister', submitForm, { timeout: 2000 })
             .then(res => {
               console.log(res)
               if (res.data === 'rigister successful') {
