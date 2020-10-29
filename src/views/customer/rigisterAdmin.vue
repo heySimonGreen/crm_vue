@@ -35,6 +35,7 @@
 <script>
 import crypto from 'crypto'
 import store from '../../store'
+import { testpost } from '../../api/customer'
 export default {
   name: 'RigisterAdmin',
   data() {
@@ -95,25 +96,26 @@ export default {
           submitForm.phonenumber = this.rigisterForm.phonenumber
           md5.update(submitForm.password)
           submitForm.password = md5.digest('hex')
-          this.$axios.post(this.url + '/admin/rigister', submitForm, { timeout: 2000 })
-            .then(res => {
-              console.log(res)
-              if (res.data === 'rigister successful') {
-                this.$notify({
-                  title: '成功',
-                  message: '添加管理员成功',
-                  type: 'success',
-                  duration: 1000
-                })
-              } else {
-                this.$notify({
-                  title: '失败',
-                  message: res.data,
-                  type: 'error',
-                  duration: 1000
-                })
-              }
-            })
+          testpost(submitForm)
+          // this.$axios.post(this.url + '/admin/rigister', submitForm, { timeout: 2000 })
+          //   .then(res => {
+          //     console.log(res)
+          //     if (res.data === 'rigister successful') {
+          //       this.$notify({
+          //         title: '成功',
+          //         message: '添加管理员成功',
+          //         type: 'success',
+          //         duration: 1000
+          //       })
+          //     } else {
+          //       this.$notify({
+          //         title: '失败',
+          //         message: res.data,
+          //         type: 'error',
+          //         duration: 1000
+          //       })
+          //     }
+          //   })
         } else {
           console.log(' not valid')
         }

@@ -94,7 +94,7 @@ const asyncRoutes = [
       path: 'rigisterAdmin',
       name: 'rigisterAdmin',
       component: () => import('@/views/customer/rigisterAdmin'),
-      meta: { title: '注册管理员' }
+      meta: { title: '添加管理员' }
     }]
   }
 ]

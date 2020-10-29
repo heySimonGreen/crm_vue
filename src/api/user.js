@@ -14,7 +14,7 @@ export function loginMyselfPost(data) {
   return request({
     url: 'http://localhost:8080/admin/loginpost',
     method: 'post',
-    data
+    params: data
   })
 }
 export function loginMyself(data) {

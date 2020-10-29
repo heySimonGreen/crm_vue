@@ -24,7 +24,7 @@ module.exports = {
    * In most cases please use '/' !!!
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
-  publicPath: '/',
+  publicPath: './',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
@@ -51,6 +51,14 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           '/': ''
+        },
+        cssSourceMap: false,
+        onProxyReq: function(proxyReq, req, res) {
+          if (proxyReq.getHeader('origin')) {
+            proxyReq.setHeader('origin', 'http://127.0.0.1:8080')
+          }
+
+          console.log('原路径：' + req.originalUrl, '代理路径：' + req.path)
         }
       }
     }

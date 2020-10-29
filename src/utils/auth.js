@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 const TokenKey = 'vue_admin_template_token'
 const Username = 'username'
 const Adminid = 'adminid'
+const Uuid = 'uuid'
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -38,4 +39,15 @@ export function setadminid(adminid) {
 
 export function removeadminid() {
   return Cookies.remove(Adminid)
+}
+export function getuuid() {
+  return Cookies.get(Uuid)
+}
+
+export function setuuid(uuid) {
+  return Cookies.set(Uuid, uuid)
+}
+
+export function removeuuid() {
+  return Cookies.remove(Uuid)
 }

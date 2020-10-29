@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getToken, getuuid } from '@/utils/auth'
+import { cryptTokenf, formatDate, signatureMD5 } from '@/utils/myutil'
 
 // create an axios instance
 const service = axios.create({
@@ -22,6 +23,26 @@ service.interceptors.request.use(
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
+      const path = config.url
+
+      const date = new Date()
+      const time = formatDate(date, 'yyyy-MM-dd hh:mm:ss')
+
+      const guid = getuuid()
+      const reg = new RegExp('"', 'g')
+      const param = JSON.stringify(config.params).toString().replace(reg, '')
+
+      const cryptToken = cryptTokenf(getuuid())
+
+      const signature = signatureMD5(time, path, guid, param, cryptToken)
+      config.headers['signature'] = signature
+
+      config.headers['time'] = time
+
+      console.log(time)
+      config.headers['guid'] = getuuid()
+      console.log(JSON.stringify(config.params))
+      console.log(config.url)
     }
     return config
   },
@@ -57,6 +78,7 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
+      console.log('res.code:' + res.code)
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {

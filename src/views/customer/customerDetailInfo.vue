@@ -366,6 +366,7 @@
 import { getCustomerDataByCidApi } from '@/api/customer'
 import { CodeToText, regionData } from 'element-china-area-data'
 import store from '../../store'
+import { contactaddress_selectByCid, contactperson_selectByCid } from '../../api/customer'
 // import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
@@ -579,7 +580,7 @@ export default {
               this.editAddressItemDataVisible = false
               this.$notify({
                 title: '成功',
-                message: '添加成功',
+                message: '编辑成功',
                 type: 'success',
                 duration: 2000
               })
@@ -615,7 +616,7 @@ export default {
               this.editePersonItemVisible = false
               this.$notify({
                 title: '成功',
-                message: '添加成功',
+                message: '编辑成功',
                 type: 'success',
                 duration: 2000
               })
@@ -850,22 +851,34 @@ export default {
         })
     },
     getContactAddressDataByCid() {
-      this.$axios.get(this.url + '/contactaddress/selectByCid', { params: this.cid }, { timeout: 3000 })
-        .then(res => {
-          this.addressData = res.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      contactaddress_selectByCid(this.cid).then(res => {
+        this.addressData = res
+      }).catch(err => {
+        console.log(err)
+      })
+      // this.$axios.get(this.url + '/contactaddress/selectByCid', { params: this.cid }, { timeout: 3000 })
+      //   .then(res => {
+      //     this.addressData = res.data
+      //   })
+      //   .catch(err => {
+      //     console.log(err)
+      //   })
     },
     getContactPsersonDataByCid() {
-      this.$axios.get(this.url + '/contactperson/selectByCid', { params: this.cid }, { timeout: 3000 })
-        .then(res => {
-          this.personData = res.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      contactperson_selectByCid(this.cid).then(res => {
+        this.personData = res
+        console.log('res: ' + res)
+      }).catch(err => {
+        console.log(err)
+      })
+
+      // this.$axios.get(this.url + '/contactperson/selectByCid', { params: this.cid }, { timeout: 3000 })
+      //   .then(res => {
+      //     this.personData = res.data
+      //   })
+      //   .catch(err => {
+      //     console.log(err)
+      //   })
     },
     goBack() {
       // 点击返回按钮，向后跳转

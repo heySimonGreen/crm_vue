@@ -1,5 +1,5 @@
 import { login, logout, getInfo, loginMyself, loginMyselfPost } from '@/api/user'
-import { getToken, setToken, removeToken, getusername, setusername, removeusername, getadminid, setadminid, removeadminid } from '@/utils/auth'
+import { getToken, setToken, removeToken, getusername, setusername, removeusername, getadminid, setadminid, removeadminid, getuuid, setuuid, removeuuid } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import Vue from 'vue'
 import Router from 'vue-router'
@@ -14,8 +14,9 @@ const getDefaultState = () => {
     avatar: '',
     username: getusername(),
     adminid: getadminid,
-    // url: 'http://localhost:8080'
-    url: 'http://192.168.1.2:8080'
+    url: 'http://localhost:8080'
+    // url: 'http://192.168.1.5:8080'
+    // url: 'http://120.27.211.113:8080'
   }
 }
 
@@ -39,6 +40,9 @@ const mutations = {
   },
   SET_ADMINID: (state, adminid) => {
     state.adminid = adminid
+  },
+  SET_UUID: (state, uuid) => {
+    state.uuid = uuid
   }
 }
 
@@ -62,11 +66,12 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       loginMyself({ username: username.trim(), passwd: password }).then(response => {
-        const { data, correctUsernameAndPasswd, adminid } = response
+        const { data, correctUsernameAndPasswd, adminid, uuid } = response
         if (correctUsernameAndPasswd == 1) {
           commit('SET_TOKEN', data.token)
           commit('SET_USERNAME', username)
           commit('SET_ADMINID', adminid)
+          commit('SET_UUID', uuid)
 
           console.log('state.username')
           console.log(state.username)
@@ -74,11 +79,12 @@ const actions = {
           setToken(data.token)
           setusername(username)
           setadminid(adminid)
+          setuuid(uuid)
           resolve()
           location.reload()
           alert('登录成功')
         } else {
-          alert('登录失败')
+          alert('登录密码或者用户名错误')
           location.reload()
         }
       }).catch(error => {
@@ -148,6 +154,7 @@ const actions = {
         resetRouter()
         removeusername()
         removeadminid()
+        removeuuid()
         commit('RESET_STATE')
         resolve()
       }).catch(error => {

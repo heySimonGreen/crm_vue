@@ -343,6 +343,9 @@ import { getadminid } from '@/utils/auth'
 import md5 from 'js-md5'
 import crypto from 'crypto'
 import store from '../../store'
+import { getusername, getuuid } from '../../utils/auth'
+import { cryptToken, cryptTokenf, formatDate, signatureMD5 } from '../../utils/myutil'
+import { customer_addCustomer3, customer_selectAllTest } from '../../api/customer'
 export default {
   name: 'CustomerManage',
   data() {
@@ -734,6 +737,28 @@ export default {
             this.addCustomerForm.role = 0
           }
           console.log(this.addCustomerForm)
+          // customer_addCustomer3(this.addCustomerForm).then(res => {
+          //   console.log(res)
+          //   this.$notify({
+          //     title: '成功',
+          //     message: '成功',
+          //     type: 'success',
+          //     duration: 4000
+          //   })
+          //   this.lnitializationData()
+          //   this.addCustomerDialogFormVisible = false
+          //   this.updatainfo = true
+          // })
+          //   .catch(err => {
+          //     console.log(err)
+          //     this.$notify({
+          //       title: '失败',
+          //       message: '失败',
+          //       type: 'error',
+          //       duration: 4000
+          //     })
+          //   })
+
           this.$axios.post(this.url + '/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
             .then(res => {
               console.log(res)
@@ -823,32 +848,56 @@ export default {
       console.log(this.contactpersonRowId)
     },
     getcustomerList() {
-      this.$axios
-        .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
-        .then(response => {
-          this.list = response.data.data
-          console.log('response.data.totalPage:')
-          console.log(response.data.totalPage)
-          this.currentTotal = response.data.totalPage
-          console.log('this.list')
-          console.log(this.list)
+      customer_selectAllTest({ adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }).then(response => {
+        if (response.data.code === '551') {
+          this.$notify({
+            title: 'error',
+            message: response.data.message,
+            type: 'error',
+            duration: 2000
+          })
+        } else {
+          this.list = response.data
+          this.currentTotal = response.totalPage
         }
-        )
-        .catch((response) => console.log(response))
+
+        // this.list = response.data
+        // // console.log('response.data.totalPage:' + JSON.stringify(response.totalPage))
+        // // console.log('response.data.totalPage:' + (response.data))
+        // this.currentTotal = response.totalPage
+        // // console.log('this.list')
+        // // console.log(this.list)
+      })
+      // 上面是封装的，拿数据是直接取response.数据，下面是自己写的axios，拿数据要写response.data.数据
+      // 下面是以前写的，没有封装，由于要加安全验证，所以必须封装了
+      // this.$axios
+      //   .get(path, { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
+      //   .then(response => {
+      //     console.log('response:' + response.data)
+      //     console.log('response:' + response.data.code)
+      //     if (response.data.code === '551') {
+      //       this.$notify({
+      //         title: 'error',
+      //         message: response.data.message,
+      //         // type: 'success',
+      //         duration: 2000
+      //       })
+      //     } else {
+      //       this.list = response.data.data
+      //       console.log('response.data.totalPage:')
+      //       console.log(response.data.totalPage)
+      //       console.log('response.data:' + response.data)
+      //       this.currentTotal = response.data.totalPage
+      //       console.log('this.list')
+      //       console.log(this.list)
+      //     }
+      //   }
+      //   )
+      //   .catch((response) => {
+      //     console.log(response)
+      //     console.log(response.code)
+      //   })
     },
-    // 下面的两个方法没有用到，是以前用来测试的
-    // getcontactaddressList() {
-    //   this.$axios
-    //     .get('contactaddress/selectAll')
-    //     .then(response => (this.listcontactaddress = response.data))
-    //     .catch((response) => console.log(response))
-    // },
-    // getcontactpersonList() {
-    //   this.$axios
-    //     .get('contactperson/selectAll')
-    //     .then(response => (this.listcontactperson = response.data))
-    //     .catch((response) => console.log(response))
-    // },
     gotoAllContactPerson(row) {
       console.log('go to new page')
       this.$router.push({ name: 'allContactperson', params: row })
@@ -885,6 +934,7 @@ export default {
       console.log(`当前页: ${val}`)
       console.log('当前页数据')
       console.log(this.list[14])
+
       if (this.showPagination === true) {
         this.$axios
           .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
