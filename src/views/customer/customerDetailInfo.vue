@@ -366,7 +366,16 @@
 import { getCustomerDataByCidApi } from '@/api/customer'
 import { CodeToText, regionData } from 'element-china-area-data'
 import store from '../../store'
-import { contactaddress_selectByCid, contactperson_selectByCid } from '../../api/customer'
+import {
+  contactaddress_addContactAddress,
+  contactaddress_deleteById,
+  contactaddress_selectByCid,
+  contactaddress_updateAddressItem,
+  contactperson_addContactPerson,
+  contactperson_deleteById,
+  contactperson_selectByCid,
+  contactperson_updateContactItem
+} from '../../api/customer'
 // import clipboard from 'clipboard'
 export default {
   name: 'CustomerDetailInfo',
@@ -574,7 +583,7 @@ export default {
       this.$refs.editAddressItemData.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
-          this.$axios.post(this.url + '/contactaddress/updateAddressItem', data, { timeout: 5000 })
+          contactaddress_updateAddressItem(data)
             .then(res => {
               console.log(res)
               this.editAddressItemDataVisible = false
@@ -589,6 +598,22 @@ export default {
             .catch(err => {
               console.log(err)
             })
+
+          // this.$axios.post(this.url + '/contactaddress/updateAddressItem', data, { timeout: 5000 })
+          //   .then(res => {
+          //     console.log(res)
+          //     this.editAddressItemDataVisible = false
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '编辑成功',
+          //       type: 'success',
+          //       duration: 2000
+          //     })
+          //     this.lnitializationData()
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         }
       })
     },
@@ -610,21 +635,38 @@ export default {
       this.$refs.editePersonItemData.validate((valid) => {
         if (valid) {
           console.log('已进入确认界面：')
-          this.$axios.post(this.url + '/contactperson/updateContactItem', this.editePersonItemData, { timeout: 3000 })
-            .then(res => {
-              console.log(res)
-              this.editePersonItemVisible = false
-              this.$notify({
-                title: '成功',
-                message: '编辑成功',
-                type: 'success',
-                duration: 2000
-              })
-              this.lnitializationData()
+          // const dataTest = new FormData()
+          // dataTest.append('editePersonItemData', JSON.stringify(this.editePersonItemData))
+          contactperson_updateContactItem((this.editePersonItemData)).then(res => {
+          // contactperson_updateContactItem(JSON.stringify(this.editePersonItemData)).then(res => {
+            console.log(res)
+            this.editePersonItemVisible = false
+            this.$notify({
+              title: '成功',
+              message: '编辑成功',
+              type: 'success',
+              duration: 2000
             })
-            .catch(err => {
-              console.log(err)
-            })
+            this.lnitializationData()
+          }).catch(err => {
+            console.log(err)
+          })
+
+          // this.$axios.post(this.url + '/contactperson/updateContactItem', this.editePersonItemData, { timeout: 3000 })
+          //   .then(res => {
+          //     console.log(res)
+          //     this.editePersonItemVisible = false
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '编辑成功',
+          //       type: 'success',
+          //       duration: 2000
+          //     })
+          //     this.lnitializationData()
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         }
       })
     },
@@ -651,7 +693,7 @@ export default {
           }
           const dataAddContactAddress = this.addCustomerForm.contactaddressList
           console.log(this.addCustomerForm.contactaddressList)
-          this.$axios.post(this.url + '/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
+          contactaddress_addContactAddress({ data: dataAddContactAddress, cid: this.cid })
             .then(res => {
               console.log(res)
               this.addContactAddressVisible = false
@@ -666,6 +708,21 @@ export default {
             .catch(err => {
               console.log(err)
             })
+          // this.$axios.post(this.url + '/contactaddress/addContactAddress', { data: dataAddContactAddress, cid: this.cid }, { timeout: 3000 })
+          //   .then(res => {
+          //     console.log(res)
+          //     this.addContactAddressVisible = false
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '添加成功',
+          //       type: 'success',
+          //       duration: 2000
+          //     })
+          //     this.lnitializationData()
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         }
       })
     },
@@ -718,7 +775,7 @@ export default {
         if (valid) {
           console.log('已进入确认界面：')
           const dataAddaddContactPerson = this.addCustomerForm.contactpersonList
-          this.$axios.post(this.url + '/contactperson/addContactPerson', { data: dataAddaddContactPerson, cid: this.cid }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+          contactperson_addContactPerson({ data: dataAddaddContactPerson, cid: this.cid })
             .then(res => {
               console.log(res)
               this.addContactPersonVisible = false
@@ -733,6 +790,22 @@ export default {
             .catch(err => {
               console.log(err)
             })
+
+          // this.$axios.post(this.url + '/contactperson/addContactPerson', { data: dataAddaddContactPerson, cid: this.cid }, { timeout: 3000 }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }})
+          //   .then(res => {
+          //     console.log(res)
+          //     this.addContactPersonVisible = false
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '添加成功',
+          //       type: 'success',
+          //       duration: 2000
+          //     })
+          //     this.lnitializationData()
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
         }
       })
     },
@@ -788,8 +861,7 @@ export default {
       console.log(index)
       if (index > 0) {
         const param = { id: row.id }
-        this.$axios
-          .delete(this.url + '/contactaddress/deleteById', { params: param })
+        contactaddress_deleteById({ id: row.id })
           .then(res => {
             console.log(res)
             this.$notify({
@@ -803,6 +875,22 @@ export default {
           .catch(err => {
             console.log(err)
           })
+
+        // this.$axios
+        //   .delete(this.url + '/contactaddress/deleteById', { params: param })
+        //   .then(res => {
+        //     console.log(res)
+        //     this.$notify({
+        //       title: '成功',
+        //       message: '删除成功',
+        //       type: 'success',
+        //       duration: 2000
+        //     })
+        //     this.lnitializationData()
+        //   })
+        //   .catch(err => {
+        //     console.log(err)
+        //   })
       } else {
         this.$notify({
           title: '失败',
@@ -817,8 +905,7 @@ export default {
       console.log(index)
       if (index > 0) {
         const param = { id: row.id }
-        this.$axios
-          .delete(this.url + '/contactperson/deleteById', { params: param })
+        contactperson_deleteById({ id: row.id })
           .then(res => {
             console.log(res)
             this.$notify({
@@ -832,6 +919,22 @@ export default {
           .catch(err => {
             console.log(err)
           })
+
+        // this.$axios
+        //   .delete(this.url + '/contactperson/deleteById', { params: param })
+        //   .then(res => {
+        //     console.log(res)
+        //     this.$notify({
+        //       title: '成功',
+        //       message: '删除成功',
+        //       type: 'success',
+        //       duration: 2000
+        //     })
+        //     this.lnitializationData()
+        //   })
+        //   .catch(err => {
+        //     console.log(err)
+        //   })
       } else {
         this.$notify({
           title: '失败',

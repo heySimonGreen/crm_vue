@@ -30,19 +30,43 @@ service.interceptors.request.use(
 
       const guid = getuuid()
       const reg = new RegExp('"', 'g')
-      const param = JSON.stringify(config.params).toString().replace(reg, '')
+      // console.log('JSON.stringify(config.params)' + JSON.stringify(config.params))
+      //post请求时param是为空，此时要给param谁为{}，以便和后台java对应，计算出来的signature一样
+      //post请求时param是为空，此时要给param谁为{}，以便和后台java对应，计算出来的signature一样
+      if (config.params == null) {
+        console.log('config.params == null')
+        // const param = JSON.stringify(config.params).toString().replace(reg, '')
+        const param = '{}'
 
-      const cryptToken = cryptTokenf(getuuid())
+        const cryptToken = cryptTokenf(getuuid())
 
-      const signature = signatureMD5(time, path, guid, param, cryptToken)
-      config.headers['signature'] = signature
+        const signature = signatureMD5(time, path, guid, param, cryptToken)
+        config.headers['signature'] = signature
 
-      config.headers['time'] = time
+        config.headers['time'] = time
 
-      console.log(time)
-      config.headers['guid'] = getuuid()
-      console.log(JSON.stringify(config.params))
-      console.log(config.url)
+        console.log(time)
+        // config.headers['guid'] = getuuid()
+        console.log(JSON.stringify(config.params))
+        console.log(config.url)
+        console.log('signature: ' + signature)
+      } else {
+        console.log('config.params != null')
+        const param = JSON.stringify(config.params).toString().replace(reg, '')
+
+        const cryptToken = cryptTokenf(getuuid())
+
+        const signature = signatureMD5(time, path, guid, param, cryptToken)
+        config.headers['signature'] = signature
+
+        config.headers['time'] = time
+
+        console.log(time)
+        // config.headers['guid'] = getuuid()
+        console.log(JSON.stringify(config.params))
+        console.log(config.url)
+        console.log('signature: ' + signature)
+      }
     }
     return config
   },

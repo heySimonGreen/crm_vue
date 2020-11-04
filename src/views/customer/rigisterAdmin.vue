@@ -96,7 +96,24 @@ export default {
           submitForm.phonenumber = this.rigisterForm.phonenumber
           md5.update(submitForm.password)
           submitForm.password = md5.digest('hex')
-          testpost(submitForm)
+          testpost(submitForm).then(res => {
+            if (res === 'rigister successful') {
+              this.$notify({
+                title: '成功',
+                message: '添加管理员成功',
+                type: 'success',
+                duration: 1000
+              })
+            } else {
+              this.$notify({
+                title: '失败',
+                message: res,
+                type: 'error',
+                duration: 1000
+              })
+            }
+          })
+
           // this.$axios.post(this.url + '/admin/rigister', submitForm, { timeout: 2000 })
           //   .then(res => {
           //     console.log(res)

@@ -27,7 +27,7 @@ export function getCustomerDataByCidApi(cid) {
     params: cid
   })
 }
-//这里应该用get但是我想试一试post,post还是不行
+// 这里应该用get但是我想试一试post,post还是不行
 export function testpost(data) {
   return request({
     url: '/admin/rigister',
@@ -65,6 +65,69 @@ export function contactaddress_selectByCid(data) {
     url: '/contactaddress/selectByCid',
     method: 'get',
     params: data
+  })
+}
+export function contactperson_updateContactItem(data) {
+  return request({
+    url: '/contactperson/updateContactItem',
+    method: 'post',
+    data
+  })
+}
+export function customer_deleteAllById(data) {
+  return request({
+    url: '/customer/deleteAllById',
+    method: 'delete',
+    params: data
+  })
+}
+export function customer_searchInputButton(data) {
+  return request({
+    url: '/customer/searchInputButton',
+    method: 'post',
+    data
+  })
+}
+export function customer_batchDeletAllCustomerByGuid(data) {
+  return request({
+    url: '/customer/batchDeletAllCustomerByGuid',
+    method: 'post',
+    data
+  })
+}
+export function contactaddress_deleteById(data) {
+  return request({
+    url: '/contactaddress/deleteById',
+    method: 'delete',
+    params: data
+  })
+}
+export function contactaddress_updateAddressItem(data) {
+  return request({
+    url: '/contactaddress/updateAddressItem',
+    method: 'post',
+    data
+  })
+}
+export function contactperson_deleteById(data) {
+  return request({
+    url: '/contactperson/deleteById',
+    method: 'delete',
+    params: data
+  })
+}
+export function contactaddress_addContactAddress(data) {
+  return request({
+    url: '/contactaddress/addContactAddress',
+    method: 'post',
+    data
+  })
+}
+export function contactperson_addContactPerson(data) {
+  return request({
+    url: '/contactperson/addContactPerson',
+    method: 'post',
+    data
   })
 }
 

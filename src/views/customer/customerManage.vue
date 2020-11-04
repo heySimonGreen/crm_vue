@@ -345,7 +345,12 @@ import crypto from 'crypto'
 import store from '../../store'
 import { getusername, getuuid } from '../../utils/auth'
 import { cryptToken, cryptTokenf, formatDate, signatureMD5 } from '../../utils/myutil'
-import { customer_addCustomer3, customer_selectAllTest } from '../../api/customer'
+import {
+  customer_addCustomer3, customer_batchDeletAllCustomerByGuid,
+  customer_deleteAllById,
+  customer_searchInputButton,
+  customer_selectAllTest
+} from '../../api/customer'
 export default {
   name: 'CustomerManage',
   data() {
@@ -572,48 +577,50 @@ export default {
       console.log(this.optionsSearchData)
       console.log(this.searchInput)
       console.log('已到达搜索请求')
-      this.$axios.post(this.url + '/customer/searchInputButton', { 'input': this.searchInput, 'role': this.optionsSearchData }, { timeout: 3000 })
-        .then(res => {
-          console.log(res)
-          if (res.data.length > 0) {
-            this.list = res.data
-            this.currentTotal = this.list.length
-            this.searchData = res.data
-            this.pageSize = 100
-            this.showPagination = false
-            console.log('this.list...........................')
-            console.log(this.list)
-            this.$notify({
-              title: '成功',
-              message: '查询成功',
-              type: 'success',
-              duration: 4000
-            })
-          } else {
-            this.$notify({
-              title: '失败',
-              message: '查无此人',
-              type: 'error',
-              duration: 4000
-            })
-          }
-          // this.lnitializationData()
+      console.log("this.searchInput+' '+this.optionsSearchData: " + this.searchInput + ' ' + this.optionsSearchData)
+      if (this.searchInput == '' || this.optionsSearchData == '') {
+        this.$notify({
+          title: '失败',
+          message: '输入需要查找的客户',
+          type: 'error',
+          duration: 2000
         })
-        .catch(err => {
-          console.log(err)
-          this.$notify({
-            title: '失败',
-            message: '输入需要查找的客户',
-            type: 'error',
-            duration: 4000
+        console.log('this.searchInput == null || this.optionsSearchData == null')
+      } else {
+        console.log('this.searchInput == null || this.optionsSearchData == null false')
+        customer_searchInputButton({ 'input': this.searchInput, 'role': this.optionsSearchData })
+          .then(res => {
+            // console.log('customer_searchInputButton res: ' + JSON.stringify(res))
+            if (res.length > 0) {
+              this.list = res
+              this.currentTotal = this.list.length
+              this.searchData = res
+              this.pageSize = 100
+              this.showPagination = false
+              console.log('this.list...........................')
+              // console.log(this.list)
+              this.$notify({
+                title: '成功',
+                message: '查询成功',
+                type: 'success',
+                duration: 2000
+              })
+            } else {
+              this.$notify({
+                title: '失败',
+                message: '查无此人',
+                type: 'error',
+                duration: 2000
+              })
+            }
           })
-        })
+      }
     },
     batchDeletCustomer() {
       console.log('已进入点击按钮后...')
       if (this.batchSelectGuid.length > 0) {
         console.log('已选择选项')
-        this.$axios.post(this.url + '/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
+        customer_batchDeletAllCustomerByGuid(this.batchSelectGuid)
           .then(res => {
             console.log(res)
             this.$notify({
@@ -626,8 +633,7 @@ export default {
             this.lnitializationData()
             this.updatainfo = true
             // setTimeout(location.reload(), 9000)
-          })
-          .catch(err => {
+          }).catch(err => {
             console.log(err)
             this.$notify({
               title: '批量删除失败',
@@ -636,6 +642,30 @@ export default {
               duration: 1000
             })
           })
+
+      //   this.$axios.post(this.url + '/customer/batchDeletAllCustomerByGuid', this.batchSelectGuid, { timeout: 3000 })
+      //     .then(res => {
+      //       console.log(res)
+      //       this.$notify({
+      //         title: '成功',
+      //         message: '批量删除成功',
+      //         type: 'success',
+      //         duration: 1000
+      //       })
+      //       this.batchSelectGuid = []
+      //       this.lnitializationData()
+      //       this.updatainfo = true
+      //       // setTimeout(location.reload(), 9000)
+      //     })
+      //     .catch(err => {
+      //       console.log(err)
+      //       this.$notify({
+      //         title: '批量删除失败',
+      //         message: '失败',
+      //         type: 'error',
+      //         duration: 1000
+      //       })
+      //     })
       } else {
         console.log('未选择选项')
         this.$notify({
@@ -667,11 +697,16 @@ export default {
     },
     delRow(row) {
       console.log(row)
-      const param = { id: row.guid }
-      this.$axios
-        .delete(this.url + '/customer/deleteAllById', { params: param })
-        .then(res => {
-          console.log(res)
+      customer_deleteAllById({ id: row.guid }).then(res => {
+        console.log('res' + res)
+        if (res !== 'deleteAllById successful') {
+          this.$notify({
+            title: '失败',
+            message: res.message,
+            type: 'error',
+            duration: 2000
+          })
+        } else {
           this.$notify({
             title: '成功',
             message: '删除成功',
@@ -679,10 +714,10 @@ export default {
             duration: 2000
           })
           this.lnitializationData()
-        })
-        .catch(err => {
-          console.log(err)
-        })
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     },
     goToDetail(cid) {
       console.log(cid)
@@ -737,31 +772,19 @@ export default {
             this.addCustomerForm.role = 0
           }
           console.log(this.addCustomerForm)
-          // customer_addCustomer3(this.addCustomerForm).then(res => {
-          //   console.log(res)
-          //   this.$notify({
-          //     title: '成功',
-          //     message: '成功',
-          //     type: 'success',
-          //     duration: 4000
-          //   })
-          //   this.lnitializationData()
-          //   this.addCustomerDialogFormVisible = false
-          //   this.updatainfo = true
-          // })
-          //   .catch(err => {
-          //     console.log(err)
-          //     this.$notify({
-          //       title: '失败',
-          //       message: '失败',
-          //       type: 'error',
-          //       duration: 4000
-          //     })
-          //   })
 
-          this.$axios.post(this.url + '/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
-            .then(res => {
-              console.log(res)
+          customer_addCustomer3(this.addCustomerForm).then(res => {
+            console.log('res:    ' + res)
+            console.log(res)
+
+            if (res != 'add customer successful!') {
+              this.$notify({
+                title: '失败',
+                message: res.message,
+                type: 'error',
+                duration: 2000
+              })
+            } else {
               this.$notify({
                 title: '成功',
                 message: '成功',
@@ -770,9 +793,9 @@ export default {
               })
               this.lnitializationData()
               this.addCustomerDialogFormVisible = false
-              this.updatainfo = true
-              // location.reload()
-            })
+              // this.updatainfo = true
+            }
+          })
             .catch(err => {
               console.log(err)
               this.$notify({
@@ -782,6 +805,30 @@ export default {
                 duration: 4000
               })
             })
+
+          // this.$axios.post(this.url + '/customer/addCustomer3', this.addCustomerForm, { timeout: 3000 })
+          //   .then(res => {
+          //     console.log(res)
+          //     this.$notify({
+          //       title: '成功',
+          //       message: '成功',
+          //       type: 'success',
+          //       duration: 4000
+          //     })
+          //     this.lnitializationData()
+          //     this.addCustomerDialogFormVisible = false
+          //     this.updatainfo = true
+          //     // location.reload()
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //     this.$notify({
+          //       title: '失败',
+          //       message: '失败',
+          //       type: 'error',
+          //       duration: 4000
+          //     })
+          //   })
         }
       })
     },
@@ -860,43 +907,7 @@ export default {
           this.list = response.data
           this.currentTotal = response.totalPage
         }
-
-        // this.list = response.data
-        // // console.log('response.data.totalPage:' + JSON.stringify(response.totalPage))
-        // // console.log('response.data.totalPage:' + (response.data))
-        // this.currentTotal = response.totalPage
-        // // console.log('this.list')
-        // // console.log(this.list)
       })
-      // 上面是封装的，拿数据是直接取response.数据，下面是自己写的axios，拿数据要写response.data.数据
-      // 下面是以前写的，没有封装，由于要加安全验证，所以必须封装了
-      // this.$axios
-      //   .get(path, { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
-      //   .then(response => {
-      //     console.log('response:' + response.data)
-      //     console.log('response:' + response.data.code)
-      //     if (response.data.code === '551') {
-      //       this.$notify({
-      //         title: 'error',
-      //         message: response.data.message,
-      //         // type: 'success',
-      //         duration: 2000
-      //       })
-      //     } else {
-      //       this.list = response.data.data
-      //       console.log('response.data.totalPage:')
-      //       console.log(response.data.totalPage)
-      //       console.log('response.data:' + response.data)
-      //       this.currentTotal = response.data.totalPage
-      //       console.log('this.list')
-      //       console.log(this.list)
-      //     }
-      //   }
-      //   )
-      //   .catch((response) => {
-      //     console.log(response)
-      //     console.log(response.code)
-      //   })
     },
     gotoAllContactPerson(row) {
       console.log('go to new page')
@@ -936,18 +947,31 @@ export default {
       console.log(this.list[14])
 
       if (this.showPagination === true) {
-        this.$axios
-          .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
-          .then(response => {
-            this.list = response.data.data
-            console.log('response.data.totalPage:')
-            console.log(response.data.totalPage)
-            this.currentTotal = response.data.totalPage
+        customer_selectAllTest({ adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage })
+          .then(res => {
+            this.list = res.data
+            console.log('res.data.totalPage:')
+            console.log(res.totalPage)
+            this.currentTotal = res.totalPage
             console.log('this.list')
             console.log(this.list)
-          }
-          )
-          .catch((response) => console.log(response))
+          })
+          .catch(res => {
+            console.log(res)
+          })
+
+        // this.$axios
+        //   .get('customer/selectAllTest', { params: { adminid: this.adminid, pagesize: this.pageSize, currentPage: this.currentPage }})
+        //   .then(response => {
+        //     this.list = response.data.data
+        //     console.log('response.data.totalPage:')
+        //     console.log(response.data.totalPage)
+        //     this.currentTotal = response.data.totalPage
+        //     console.log('this.list')
+        //     console.log(this.list)
+        //   }
+        //   )
+        //   .catch((response) => console.log(response))
       } else {
         this.list = this.searchData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
       }

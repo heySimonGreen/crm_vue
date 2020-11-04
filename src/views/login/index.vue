@@ -105,10 +105,10 @@ export default {
     this.base_api = process.env.VUE_APP_BASE_API
     console.log('this.base_api:................')
     console.log(this.base_api)
-    axios
-      .get('/customer/selectAll')
-      .then(response => (this.list = response))
-    console.log(this.list)
+    // axios
+    //   .get('/customer/selectAll')
+    //   .then(response => (this.list = response))
+    // console.log(this.list)
   },
   methods: {
     showPwd() {
